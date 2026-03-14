@@ -1,15 +1,16 @@
+import CtaButton from "@/components/CtaButton";
 import { Image } from "expo-image";
 import { Stack, useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CtaButton from "../components/CtaButton";
 
 export default function OnBoarding3() {
   const router = useRouter();
 
-  function pressHandler() {
+  async function pressHandler() {
     router.replace("/(tabs)");
-    //TODO: save data to store that onboarding is completed
+    await SecureStore.setItemAsync("onboardingCompleted", "true");
   }
 
   return (
