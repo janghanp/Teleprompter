@@ -35,6 +35,16 @@
             "imageWidth": 76
           }
         }
+      ],
+      [
+        "expo-asset",
+        {
+          "assets": [
+            "./assets/images/camera.png",
+            "./assets/images/teleprompting.png",
+            "./assets/images/disk.jpg"
+          ]
+        }
       ]
     ],
     "experiments": {
