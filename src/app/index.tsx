@@ -12,7 +12,7 @@ export default function Index() {
       );
 
       if (onboardingCompleted === "true") {
-        router.replace("/(tabs)");
+        router.replace("/(tabs)/home");
       } else {
         router.replace("/OnBoarding1");
       }

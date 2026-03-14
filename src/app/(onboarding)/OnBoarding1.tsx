@@ -1,8 +1,8 @@
+import CtaButton from "@/components/CtaButton";
 import { Image } from "expo-image";
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CtaButton from "../components/CtaButton";
 
 export default function OnBoarding1() {
   const router = useRouter();
@@ -13,10 +13,9 @@ export default function OnBoarding1() {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <Stack.Screen options={{ headerShown: false }} />
       <View style={styles.heroCard}>
         <Image
-          source={require("../../assets/images/camera.png")}
+          source={require("@/assets/images/camera.png")}
           style={styles.heroImage}
           contentFit="cover"
         />
