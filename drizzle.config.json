@@ -1,0 +1,6 @@
+{
+  "dialect": "sqlite",
+  "driver": "expo",
+  "schema": "./db/schema.ts",
+  "out": "./drizzle"
+}

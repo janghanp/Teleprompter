@@ -9,7 +9,7 @@ export default function OnBoarding3() {
   const router = useRouter();
 
   async function pressHandler() {
-    router.replace("/(tabs)/home");
+    router.replace("/(tabs)/scripts");
     await SecureStore.setItemAsync("onboardingCompleted", "true");
   }
 

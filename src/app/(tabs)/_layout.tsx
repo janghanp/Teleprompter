@@ -23,11 +23,18 @@ export default function TabLayout() {
           light: "black",
         })}
       >
-        <NativeTabs.Trigger name="home">
-          <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger name="scripts">
+          <NativeTabs.Trigger.Label>Scripts</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
-            sf={{ default: "house", selected: "house.fill" }}
-            md="home"
+            sf={{ default: "doc.text", selected: "doc.text.fill" }}
+            md="description"
+          />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="recordings">
+          <NativeTabs.Trigger.Label>Recordings</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon
+            sf={{ default: "video", selected: "video.fill" }}
+            md="fiber_manual_record"
           />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="settings">
