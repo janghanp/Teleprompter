@@ -10,6 +10,7 @@ import {
 } from "expo-router";
 import React, { use, useEffect, useState } from "react";
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -46,6 +47,7 @@ export default function ScriptDetailScreen() {
     };
 
     updateScript(updatedScript);
+    Keyboard.dismiss();
   };
 
   return (
