@@ -24,7 +24,7 @@ export default function ScriptsScreen() {
   const itemSize =
     (width - LIST_PADDING * 2 - COLUMN_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
 
-  function pressHandler() {
+  const pressHandler = () => {
     Alert.prompt("New Script", "Enter a name of the new script", [
       { text: "Cancel", style: "cancel" },
       {
@@ -39,9 +39,9 @@ export default function ScriptsScreen() {
         },
       },
     ]);
-  }
+  };
 
-  function renderItem({ item, index }: { item: Script; index: number }) {
+  const renderItem = ({ item, index }: { item: Script; index: number }) => {
     const isRowEnd = (index + 1) % GRID_COLUMNS === 0;
     const titleText = (item.title ?? "").trim();
     const title =
@@ -60,7 +60,7 @@ export default function ScriptsScreen() {
         </Text>
       </View>
     );
-  }
+  };
 
   const scriptItems = (scripts ?? []) as Script[];
   const statusMessage = isScriptsLoading

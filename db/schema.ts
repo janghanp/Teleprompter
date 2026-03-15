@@ -10,7 +10,8 @@ export const scriptsTable = sqliteTable("scripts", {
     .default(sql`(unixepoch())`),
   updatedAt: integer("updatedAt", { mode: "number" })
     .notNull()
-    .default(sql`(unixepoch())`),
+    .default(sql`(unixepoch())`)
+    .$onUpdateFn(() => sql`(unixepoch())`),
 });
 
 export const recordingsTable = sqliteTable("recordings", {
@@ -21,5 +22,6 @@ export const recordingsTable = sqliteTable("recordings", {
     .default(sql`(unixepoch())`),
   updatedAt: integer("updatedAt", { mode: "number" })
     .notNull()
-    .default(sql`(unixepoch())`),
+    .default(sql`(unixepoch())`)
+    .$onUpdateFn(() => sql`(unixepoch())`),
 });

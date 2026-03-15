@@ -1,20 +1,14 @@
 import { Stack } from "expo-router";
 
-export default function ScriptsLayout() {
+export default function ScriptDetailLayout() {
   return (
     <Stack>
       <Stack.Screen
         name="index"
         options={{
           headerLargeTitleEnabled: true,
-          headerTitle: "Scripts",
+          headerTitle: "",
           headerTransparent: true,
-        }}
-      />
-      <Stack.Screen
-        name="[id]"
-        options={{
-          headerShown: false,
         }}
       />
     </Stack>

@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 export default function SettingsScreen() {
   return (
@@ -6,36 +6,7 @@ export default function SettingsScreen() {
       <ScrollView
         style={{ padding: 16 }}
         contentInsetAdjustmentBehavior="automatic"
-      >
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-        <Text>Note content...</Text>
-      </ScrollView>
+      ></ScrollView>
     </>
   );
 }

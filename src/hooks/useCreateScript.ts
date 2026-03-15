@@ -2,7 +2,7 @@ import { insertScript } from "@/utils/apis";
 import { CreateScriptInput } from "@/utils/interfaces";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const useCreateScript = () => {
+export function useCreateScript() {
   const queryClient = useQueryClient();
 
   const { mutate, mutateAsync, isPending } = useMutation({
@@ -22,4 +22,4 @@ export const useCreateScript = () => {
     createScriptAsync: mutateAsync,
     isCreateScriptPending: isPending,
   };
-};
+}

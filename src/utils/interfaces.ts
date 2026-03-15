@@ -3,6 +3,12 @@ export interface CreateScriptInput {
   content?: string;
 }
 
+export interface UpdateScriptInput {
+  id: number;
+  title: string;
+  content?: string | null;
+}
+
 export interface Script {
   id: number;
   title: string;
