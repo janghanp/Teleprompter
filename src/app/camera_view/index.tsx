@@ -1,23 +1,42 @@
 import { TabBarContext } from "@/context/TabBarContext";
+import { useGetScriptById } from "@/hooks/useGetScriptById";
 import {
   CameraMode,
   CameraType,
   CameraView,
   useCameraPermissions,
 } from "expo-camera";
-import { Stack, useFocusEffect, useRouter } from "expo-router";
+import {
+  Stack,
+  useFocusEffect,
+  useLocalSearchParams,
+  useRouter,
+} from "expo-router";
 import { use, useEffect, useRef, useState } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import {
+  Button,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 export default function CameraViewScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
   const { setIsTabBarHidden } = use(TabBarContext);
   const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
+  const { script, isScriptLoading, scriptError } = useGetScriptById(Number(id));
   const ref = useRef<any>(null);
   const [uri, setUri] = useState<string | null>(null);
   const [mode, setMode] = useState<CameraMode>("video");
   const [facing, setFacing] = useState<CameraType>("back");
   const [isRecording, setIsRecording] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollY = useRef(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!permission || !permission.granted) {
@@ -30,12 +49,28 @@ export default function CameraViewScreen() {
     return () => setIsTabBarHidden(false);
   });
 
+  useEffect(() => {
+    if (isRecording) {
+      intervalRef.current = setInterval(() => {
+        scrollY.current += 1;
+        scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
+      }, 30); // lower = faster, higher = slower
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    }
+  }, [isRecording]);
+
   const recordVideo = async () => {
     if (isRecording) {
       setIsRecording(false);
       ref.current?.stopRecording();
       return;
     }
+
+    // Keep recording aligned to wherever the user last positioned the script.
+    scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
 
     setIsRecording(true);
     const video = await ref.current?.recordAsync();
@@ -67,6 +102,12 @@ export default function CameraViewScreen() {
     );
   }
 
+  const handleScriptScroll = (
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ) => {
+    scrollY.current = event.nativeEvent.contentOffset.y;
+  };
+
   return (
     <>
       <Stack.Toolbar placement="left">
@@ -83,7 +124,6 @@ export default function CameraViewScreen() {
           onPress={toggleFacing}
         />
       </Stack.Toolbar>
-
       <Stack.Toolbar placement="bottom">
         <Stack.Toolbar.Button icon={"note.text"} />
         <Stack.Toolbar.Spacer />
@@ -106,6 +146,20 @@ export default function CameraViewScreen() {
             responsiveOrientationWhenOrientationLocked
           />
         </View>
+        {/* Script overlay */}
+        {script && (
+          <View style={styles.scriptOverlay}>
+            <ScrollView
+              ref={scrollRef}
+              showsVerticalScrollIndicator={true}
+              contentContainerStyle={styles.scriptScrollContent}
+              scrollEventThrottle={16}
+              onScroll={handleScriptScroll}
+            >
+              <Text style={styles.scriptText}>{script[0]?.content}</Text>
+            </ScrollView>
+          </View>
+        )}
       </View>
     </>
   );
@@ -148,5 +202,24 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 50,
+  },
+  scriptScrollContent: {
+    paddingBottom: 8, // breathing room at the bottom
+  },
+  scriptOverlay: {
+    position: "absolute",
+    top: 20,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderRadius: 12,
+    padding: 16,
+    maxHeight: "40%",
+  },
+  scriptText: {
+    color: "#fff",
+    fontSize: 40,
+    fontWeight: "700",
+    lineHeight: 60,
   },
 });

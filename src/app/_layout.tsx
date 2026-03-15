@@ -7,6 +7,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen
           name="(onboarding)/OnBoarding1"
           options={{ headerShown: false }}
@@ -20,6 +21,7 @@ export default function RootLayout() {
           options={{ headerShown: false }}
         />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="camera_view" options={{ headerShown: false }} />
       </Stack>
     </QueryClientProvider>
   );

@@ -50,6 +50,10 @@ export default function ScriptDetailScreen() {
     Keyboard.dismiss();
   };
 
+  const goToCameraViewhandler = () => {
+    router.push(`/camera_view?id=${id}`);
+  };
+
   return (
     <>
       <Stack.Toolbar placement="left">
@@ -60,6 +64,13 @@ export default function ScriptDetailScreen() {
         />
       </Stack.Toolbar>
       <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Button
+          variant="prominent"
+          tintColor={"red"}
+          onPress={goToCameraViewhandler}
+        >
+          • Rec
+        </Stack.Toolbar.Button>
         <Stack.Toolbar.Button variant="plain" onPress={saveHandler}>
           Save
         </Stack.Toolbar.Button>
@@ -96,7 +107,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 24,
     textAlignVertical: "top", // Crucial for Android
-    // borderWidth: 1,
-    // borderColor: "red",
   },
 });

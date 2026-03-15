@@ -9,7 +9,6 @@ export default function CameraViewLayout() {
           headerShown: false,
           headerTitle: "",
           headerLargeTitleEnabled: true,
-          headerBackTitle: "Back",
         }}
       />
     </Stack>

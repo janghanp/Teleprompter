@@ -33,7 +33,18 @@ export default function ScriptItem({ script }: Props) {
   };
 
   const deleteHandler = () => {
-    deleteScript(script.id);
+    Alert.alert(
+      "Delete Script",
+      "Are you sure you want to delete this script?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteScript(script.id),
+        },
+      ],
+    );
   };
 
   const renameTitleHandler = () => {

@@ -32,7 +32,7 @@ export default function Index() {
       );
 
       if (onboardingCompleted === "true") {
-        router.replace("/(tabs)/home");
+        router.replace("/(tabs)/scripts");
       } else {
         router.replace("/OnBoarding1");
       }

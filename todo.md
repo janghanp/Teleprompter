@@ -1,3 +1,3 @@
 - [] confirmation dialog before deleting (expo ui)
+
 - [] how to compose recording view on script detail screen
-- [] index header shown when redirecting from the main index.tsx file
