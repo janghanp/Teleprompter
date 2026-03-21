@@ -1,3 +1,3 @@
 - [] refine scroll speed
 
-- [] dark theme
+- [] overlay resize by dragging
