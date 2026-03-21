@@ -1,34 +1,37 @@
-import { ScrollView, StyleSheet } from "react-native";
+import { Button, Form, Host, Section, Toggle } from "@expo/ui/swift-ui";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { StyleSheet } from "react-native";
 
 export default function SettingsScreen() {
+  const router = useRouter();
+  const [darkMode, setDarkMode] = useState(false);
+
   return (
-    <>
-      <ScrollView
-        style={{ padding: 16 }}
-        contentInsetAdjustmentBehavior="automatic"
-      ></ScrollView>
-    </>
+    <Host style={{ flex: 1 }}>
+      <Form>
+        <Section title="Preferences">
+          <Button
+            label="Font Size"
+            onPress={() => {
+              router.push("/(tabs)/settings/fontsize");
+            }}
+          />
+          <Button
+            label="Scroll Speed"
+            onPress={() => {
+              router.push("/(tabs)/settings/scrollspeed");
+            }}
+          />
+          <Toggle
+            label="Dark mode"
+            isOn={darkMode}
+            onIsOnChange={setDarkMode}
+          />
+        </Section>
+      </Form>
+    </Host>
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 12,
-  },
-  content: {
-    marginTop: 24,
-    gap: 10,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1D2B3C",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#6B7686",
-    lineHeight: 22,
-  },
-});
+const styles = StyleSheet.create({});

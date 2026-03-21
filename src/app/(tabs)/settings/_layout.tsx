@@ -11,6 +11,18 @@ export default function SettingsLayout() {
           headerTransparent: true,
         }}
       />
+      <Stack.Screen
+        name="fontsize"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="scrollspeed"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

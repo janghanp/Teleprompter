@@ -52,7 +52,7 @@ export default function RecordingItem({ item, onDeleted }: Props) {
     if (isDeletingRecording) return;
 
     Alert.alert(
-      "Delete Script",
+      "Delete Recording",
       "Are you sure you want to delete this recording?",
       [
         { text: "Cancel", style: "cancel" },

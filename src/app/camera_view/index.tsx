@@ -15,6 +15,7 @@ import {
   useLocalSearchParams,
   useRouter,
 } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { Activity, use, useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -58,11 +59,17 @@ export default function CameraViewScreen() {
   });
 
   useEffect(() => {
+    const scrollSpeedInitialValue = SecureStore.getItem("scrollSpeed");
+
+    const speedPxPerSec = 20 + Number(scrollSpeedInitialValue) * 40;
+    const intervalMs = 16;
+    const step = (speedPxPerSec * intervalMs) / 1000;
+
     if (isRecording) {
       intervalRef.current = setInterval(() => {
-        scrollY.current += 1;
+        scrollY.current += step;
         scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
-      }, 30); // lower = faster, higher = slower
+      }, intervalMs);
 
       recordingTimeRef.current = setInterval(() => {
         setCurrentRecordingTime((prev) => prev + 1);
@@ -153,6 +160,10 @@ export default function CameraViewScreen() {
     );
   }
 
+  const fontSizeInitialValue = SecureStore.getItem("fontSize");
+  const fontSize = 10 + Number(fontSizeInitialValue) * 4;
+  const lineHeight = Math.round(fontSize * 1.4);
+
   return (
     <>
       <Stack.Toolbar placement="left">
@@ -221,7 +232,9 @@ export default function CameraViewScreen() {
               scrollEventThrottle={16}
               onScroll={handleScriptScroll}
             >
-              <Text style={styles.scriptText}>{script[0]?.content}</Text>
+              <Text style={[styles.scriptText, { fontSize, lineHeight }]}>
+                {script[0]?.content}
+              </Text>
             </ScrollView>
           </View>
         )}
