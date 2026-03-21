@@ -13,6 +13,8 @@ import {
 import { Image as ExpoImage } from "expo-image";
 import { Album, Asset, requestPermissionsAsync } from "expo-media-library/next";
 import { useRouter } from "expo-router";
+import { useVideoPlayer } from "expo-video";
+import { useEffect, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 
 interface Props {
@@ -22,7 +24,22 @@ interface Props {
 
 export default function RecordingItem({ item, onDeleted }: Props) {
   const router = useRouter();
+  const player = useVideoPlayer(item.uri);
+  const [liveThumbnail, setLiveThumbnail] = useState<string | null>(null);
   const { deleteRecording, isDeletingRecording } = useDeleteRecording();
+
+  useEffect(() => {
+    const test = async () => {
+      try {
+        const [thumb] = await player.generateThumbnailsAsync(0.5);
+        setLiveThumbnail(thumb as unknown as string);
+      } catch (e) {
+        console.warn("Thumbnail generation failed", e);
+      }
+    };
+
+    test();
+  }, [player, item.thumbnail]);
 
   const pressHandler = () => {
     router.push({
@@ -100,9 +117,9 @@ export default function RecordingItem({ item, onDeleted }: Props) {
               onTapGesture(pressHandler),
             ]}
           >
-            {item.thumbnail ? (
+            {liveThumbnail ? (
               <ExpoImage
-                source={item.thumbnail}
+                source={liveThumbnail}
                 style={styles.thumbnail}
                 contentFit="cover"
               />

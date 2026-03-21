@@ -51,8 +51,6 @@ export default function TempVideo({ tempVideoUri }: Props) {
     setIsOpen(true);
   };
 
-  console.log(duration);
-
   return (
     <View style={styles.container}>
       {thumbnail ? (

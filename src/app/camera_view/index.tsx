@@ -115,7 +115,7 @@ export default function CameraViewScreen() {
     ]);
   };
 
-  const saveHandler = () => {
+  const saveHandler = async () => {
     if (!currentVideoUri) {
       return;
     }
@@ -207,6 +207,7 @@ export default function CameraViewScreen() {
             mode={mode}
             facing={facing}
             mute={false}
+            mirror={facing === "front" ? true : false}
             responsiveOrientationWhenOrientationLocked
           />
         </View>

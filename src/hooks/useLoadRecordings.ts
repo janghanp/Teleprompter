@@ -1,8 +1,6 @@
 import { RecordingItemType } from "@/utils/interfaces";
 import { Directory, File, Paths } from "expo-file-system";
-import { useFocusEffect } from "expo-router";
-import { createVideoPlayer, type VideoThumbnail } from "expo-video";
-import { useCallback, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function useLoadRecordings() {
   const [recordings, setRecordings] = useState<RecordingItemType[]>([]);
@@ -10,7 +8,7 @@ export function useLoadRecordings() {
   const [isLoading, setIsLoading] = useState(false);
   const loadIdRef = useRef(0);
 
-  const loadRecordings = useCallback(async () => {
+  const loadRecordings = () => {
     const loadId = ++loadIdRef.current;
     setIsLoading(true);
 
@@ -25,6 +23,7 @@ export function useLoadRecordings() {
       }
 
       const contents = directory.list();
+
       const files = contents.filter(
         (item): item is File => item instanceof File,
       );
@@ -47,36 +46,6 @@ export function useLoadRecordings() {
       setRecordings(videos);
 
       if (videos.length === 0) return;
-
-      const player = createVideoPlayer(null);
-      const thumbnailsByUri = new Map<string, VideoThumbnail>();
-
-      try {
-        for (const video of videos) {
-          try {
-            await player.replaceAsync(video.uri);
-            const [thumbnail] = await player.generateThumbnailsAsync(0.5, {
-              maxWidth: 240,
-            });
-            if (thumbnail) {
-              thumbnailsByUri.set(video.uri, thumbnail);
-            }
-          } catch (thumbnailError) {
-            console.warn("Failed to generate thumbnail", thumbnailError);
-          }
-        }
-      } finally {
-        player.release();
-      }
-
-      if (loadId !== loadIdRef.current) return;
-      setRecordings((previous) =>
-        previous.map((recording) => ({
-          ...recording,
-          thumbnail:
-            thumbnailsByUri.get(recording.uri) ?? recording.thumbnail ?? null,
-        })),
-      );
     } catch (caught) {
       if (loadId !== loadIdRef.current) return;
       setRecordings([]);
@@ -88,13 +57,11 @@ export function useLoadRecordings() {
         setIsLoading(false);
       }
     }
-  }, []);
+  };
 
-  useFocusEffect(
-    useCallback(() => {
-      void loadRecordings();
-    }, [loadRecordings]),
-  );
+  useEffect(() => {
+    loadRecordings();
+  }, []);
 
   return {
     recordings,
