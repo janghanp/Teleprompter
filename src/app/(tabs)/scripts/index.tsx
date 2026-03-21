@@ -2,6 +2,7 @@ import ScriptItem from "@/components/ScriptItem";
 import { useCreateScript } from "@/hooks/useCreateScript";
 import { useGetAllScripts } from "@/hooks/useGetAllScripts";
 import { CreateScriptInput, Script } from "@/utils/interfaces";
+import { useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import {
   Alert,
@@ -18,6 +19,7 @@ const ROW_GAP = 20;
 const LIST_PADDING = 16;
 
 export default function ScriptsScreen() {
+  const theme = useTheme();
   const { width } = useWindowDimensions();
   const { createScript } = useCreateScript();
   const { scripts, scriptsError, isScriptsLoading } = useGetAllScripts();
@@ -55,7 +57,10 @@ export default function ScriptsScreen() {
         ]}
       >
         <ScriptItem script={item} />
-        <Text numberOfLines={1} style={styles.title}>
+        <Text
+          numberOfLines={1}
+          style={[styles.title, { color: theme.colors.text }]}
+        >
           {title}
         </Text>
       </View>

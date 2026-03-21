@@ -10,6 +10,7 @@ import {
   padding,
   shapes,
 } from "@expo/ui/swift-ui/modifiers";
+import { useTheme } from "@react-navigation/native";
 import { Image as ExpoImage } from "expo-image";
 import { Album, Asset, requestPermissionsAsync } from "expo-media-library/next";
 import { useRouter } from "expo-router";
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export default function RecordingItem({ item, onDeleted }: Props) {
+  const theme = useTheme();
   const router = useRouter();
   const player = useVideoPlayer(item.uri);
   const [liveThumbnail, setLiveThumbnail] = useState<string | null>(null);
@@ -109,7 +111,7 @@ export default function RecordingItem({ item, onDeleted }: Props) {
               padding({ all: 8 }),
               frame({ width: 100, height: 100, alignment: "topLeading" }),
               background(
-                "white",
+                theme.colors.card,
                 shapes.roundedRectangle({ cornerRadius: 11 }),
               ),
               aspectRatio({ ratio: 1, contentMode: "fit" }),

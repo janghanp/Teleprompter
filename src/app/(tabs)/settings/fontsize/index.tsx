@@ -1,5 +1,6 @@
 import { TabBarContext } from "@/context/TabBarContext";
 import { Host, Slider, Text as SwiftText } from "@expo/ui/swift-ui";
+import { useTheme } from "@react-navigation/native";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { use, useEffect, useState } from "react";
@@ -7,6 +8,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function FontSizeScreen() {
+  const theme = useTheme();
   const router = useRouter();
   const { setIsTabBarHidden } = use(TabBarContext);
   const fontSizeInitialValue = SecureStore.getItem("fontSize");
@@ -35,7 +37,9 @@ export default function FontSizeScreen() {
           onPress={() => router.back()}
         />
       </Stack.Toolbar>
-      <SafeAreaView style={styles.screen}>
+      <SafeAreaView
+        style={[styles.screen, { backgroundColor: theme.colors.card }]}
+      >
         <View style={styles.scriptOverlay}>
           <ScrollView
             showsVerticalScrollIndicator={true}

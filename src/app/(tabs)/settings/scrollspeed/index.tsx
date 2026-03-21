@@ -1,5 +1,6 @@
 import { TabBarContext } from "@/context/TabBarContext";
 import { Host, Slider, Text as SwiftText } from "@expo/ui/swift-ui";
+import { useTheme } from "@react-navigation/native";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { use, useEffect, useRef, useState } from "react";
@@ -14,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ScrollSpeedScreen() {
+  const theme = useTheme();
   const router = useRouter();
   const { setIsTabBarHidden } = use(TabBarContext);
   const fontSizeInitialValue = SecureStore.getItem("fontSize");
@@ -78,7 +80,9 @@ export default function ScrollSpeedScreen() {
           onPress={() => router.back()}
         />
       </Stack.Toolbar>
-      <SafeAreaView style={styles.screen}>
+      <SafeAreaView
+        style={[styles.screen, { backgroundColor: theme.colors.card }]}
+      >
         <View style={styles.scriptOverlay}>
           <ScrollView
             ref={scrollRef}

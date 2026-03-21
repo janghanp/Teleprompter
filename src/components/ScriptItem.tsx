@@ -12,6 +12,7 @@ import {
   shapes,
   truncationMode,
 } from "@expo/ui/swift-ui/modifiers";
+import { useTheme } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
 
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export default function ScriptItem({ script }: Props) {
+  const theme = useTheme();
   const router = useRouter();
   const { deleteScript } = useDeleteScript();
   const { updateScript } = useUpdateScript();
@@ -90,7 +92,7 @@ export default function ScriptItem({ script }: Props) {
               padding({ all: 8 }),
               frame({ width: 100, height: 100, alignment: "topLeading" }),
               background(
-                "white",
+                theme.colors.card,
                 shapes.roundedRectangle({ cornerRadius: 11 }),
               ),
               aspectRatio({ ratio: 1, contentMode: "fit" }),

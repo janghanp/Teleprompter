@@ -1,6 +1,7 @@
 import RecordingItem from "@/components/RecordingItem";
 import { useLoadRecordings } from "@/hooks/useLoadRecordings";
 import { RecordingItemType } from "@/utils/interfaces";
+import { useTheme } from "@react-navigation/native";
 import {
   FlatList,
   StyleSheet,
@@ -15,6 +16,7 @@ const ROW_GAP = 20;
 const LIST_PADDING = 16;
 
 export default function RecordingsScreen() {
+  const theme = useTheme();
   const { width } = useWindowDimensions();
   const itemSize =
     (width - LIST_PADDING * 2 - COLUMN_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
@@ -47,7 +49,10 @@ export default function RecordingsScreen() {
             void loadRecordings();
           }}
         />
-        <Text numberOfLines={1} style={styles.title}>
+        <Text
+          numberOfLines={1}
+          style={[styles.title, { color: theme.colors.text }]}
+        >
           {title}
         </Text>
       </View>

@@ -1,11 +1,11 @@
-import { Button, Form, Host, Section, Toggle } from "@expo/ui/swift-ui";
+import { Button, Form, Host, Section } from "@expo/ui/swift-ui";
+import { useTheme } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import { StyleSheet } from "react-native";
 
 export default function SettingsScreen() {
+  const theme = useTheme();
   const router = useRouter();
-  const [darkMode, setDarkMode] = useState(false);
 
   return (
     <Host style={{ flex: 1 }}>
@@ -22,11 +22,6 @@ export default function SettingsScreen() {
             onPress={() => {
               router.push("/(tabs)/settings/scrollspeed");
             }}
-          />
-          <Toggle
-            label="Dark mode"
-            isOn={darkMode}
-            onIsOnChange={setDarkMode}
           />
         </Section>
       </Form>

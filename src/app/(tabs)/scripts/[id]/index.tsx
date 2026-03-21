@@ -2,6 +2,7 @@ import { TabBarContext } from "@/context/TabBarContext";
 import { useGetScriptById } from "@/hooks/useGetScriptById";
 import { useUpdateScript } from "@/hooks/useUpdateScript";
 import { UpdateScriptInput } from "@/utils/interfaces";
+import { useTheme } from "@react-navigation/native";
 import {
   Stack,
   useFocusEffect,
@@ -19,6 +20,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ScriptDetailScreen() {
+  const theme = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { script, isScriptLoading, scriptError } = useGetScriptById(Number(id));
   const { updateScript, isUpdateScriptPending } = useUpdateScript();
@@ -75,19 +77,21 @@ export default function ScriptDetailScreen() {
           Save
         </Stack.Toolbar.Button>
       </Stack.Toolbar>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: theme.colors.card }]}
+      >
         <KeyboardAvoidingView
-          style={styles.container}
+          style={[styles.container, { backgroundColor: theme.colors.card }]}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
         >
           <TextInput
-            style={styles.editor}
+            style={[styles.editor, { color: theme.colors.text }]}
             multiline={true}
             placeholder="Start typing here..."
             value={text}
             onChangeText={setText}
-            textAlignVertical="top" // Android top alignment
+            textAlignVertical="top"
           />
         </KeyboardAvoidingView>
       </SafeAreaView>
