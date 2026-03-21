@@ -48,7 +48,7 @@ export default function ScrollSpeedScreen() {
       clearInterval(intervalRef.current);
     }
 
-    const speedPxPerSec = 20 + scrollSpeedValue * 2;
+    const speedPxPerSec = 6 + scrollSpeedValue * 5;
     const intervalMs = 16;
     const step = (speedPxPerSec * intervalMs) / 1000;
 
@@ -120,8 +120,8 @@ export default function ScrollSpeedScreen() {
             <Slider
               value={scrollSpeedValue}
               min={1}
-              max={10}
-              step={0.5}
+              max={20}
+              step={1}
               label={<SwiftText>Speed</SwiftText>}
               minimumValueLabel={<SwiftText>1</SwiftText>}
               maximumValueLabel={<SwiftText>10</SwiftText>}
