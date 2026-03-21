@@ -4,11 +4,10 @@
     "slug": "Teleprompter",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/app_icon.png",
     "scheme": "teleprompter",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
       "bundleIdentifier": "com.anonymous.Teleprompter"
     },
     "android": {
@@ -29,11 +28,13 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "android": {
-            "image": "./assets/images/splash-icon.png",
-            "imageWidth": 76
-          }
+          "backgroundColor": "#232323",
+          "image": "./assets/images/app_icon.png",
+          // "dark": {
+          //   "image": "./assets/images/splash-icon-dark.png",
+          //   "backgroundColor": "#000000"
+          // },
+          "imageWidth": 200
         }
       ],
       [
