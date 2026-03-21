@@ -1,5 +1,6 @@
 import RecordingItem from "@/components/RecordingItem";
 import { useLoadRecordings } from "@/hooks/useLoadRecordings";
+import { formatModified } from "@/utils";
 import { RecordingItemType } from "@/utils/interfaces";
 import { useTheme } from "@react-navigation/native";
 import {
@@ -31,9 +32,7 @@ export default function RecordingsScreen() {
     index: number;
   }) => {
     const isRowEnd = (index + 1) % GRID_COLUMNS === 0;
-    const titleText = (item.name ?? "").trim();
-    const title =
-      titleText.length > 20 ? `${titleText.slice(0, 20)}...` : titleText;
+    const modifiedLabel = formatModified(item.modified) || "Unknown date";
 
     return (
       <View
@@ -53,7 +52,7 @@ export default function RecordingsScreen() {
           numberOfLines={1}
           style={[styles.title, { color: theme.colors.text }]}
         >
-          {title}
+          {modifiedLabel}
         </Text>
       </View>
     );

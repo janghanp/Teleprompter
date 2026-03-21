@@ -61,7 +61,7 @@ export default function CameraViewScreen() {
   useEffect(() => {
     const scrollSpeedInitialValue = SecureStore.getItem("scrollSpeed");
 
-    const speedPxPerSec = 20 + Number(scrollSpeedInitialValue) * 40;
+    const speedPxPerSec = 20 + Number(scrollSpeedInitialValue) * 2;
     const intervalMs = 16;
     const step = (speedPxPerSec * intervalMs) / 1000;
 

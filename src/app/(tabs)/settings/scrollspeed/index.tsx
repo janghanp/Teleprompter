@@ -42,7 +42,7 @@ export default function ScrollSpeedScreen() {
       clearInterval(intervalRef.current);
     }
 
-    const speedPxPerSec = 20 + scrollSpeedValue * 40; // tune this
+    const speedPxPerSec = 20 + scrollSpeedValue * 2;
     const intervalMs = 16;
     const step = (speedPxPerSec * intervalMs) / 1000;
 
