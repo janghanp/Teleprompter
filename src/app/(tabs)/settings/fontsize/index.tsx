@@ -1,5 +1,11 @@
 import { TabBarContext } from "@/context/TabBarContext";
-import { Host, Slider, Text as SwiftText } from "@expo/ui/swift-ui";
+import {
+  Host,
+  Slider,
+  Spacer,
+  Text as SwiftText,
+  VStack,
+} from "@expo/ui/swift-ui";
 import { useTheme } from "@react-navigation/native";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -62,17 +68,22 @@ export default function FontSizeScreen() {
         </View>
 
         <Host matchContents style={styles.sliderHost}>
-          <Slider
-            value={fontSizeValue}
-            min={1}
-            max={10}
-            step={1}
-            label={<SwiftText>Size</SwiftText>}
-            minimumValueLabel={<SwiftText>1</SwiftText>}
-            maximumValueLabel={<SwiftText>10</SwiftText>}
-            onValueChange={setFontSizeValue}
-            modifiers={[]}
-          />
+          <VStack>
+            <SwiftText>Font Size</SwiftText>
+            <Spacer />
+            <Spacer />
+            <Slider
+              value={fontSizeValue}
+              min={1}
+              max={10}
+              step={1}
+              label={<SwiftText>Size</SwiftText>}
+              minimumValueLabel={<SwiftText>1</SwiftText>}
+              maximumValueLabel={<SwiftText>10</SwiftText>}
+              onValueChange={setFontSizeValue}
+              modifiers={[]}
+            />
+          </VStack>
         </Host>
       </SafeAreaView>
     </>

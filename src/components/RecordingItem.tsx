@@ -3,12 +3,8 @@ import { RecordingItemType } from "@/utils/interfaces";
 import { Button, ContextMenu, Host, VStack } from "@expo/ui/swift-ui";
 import {
   aspectRatio,
-  background,
   clipShape,
-  frame,
   onTapGesture,
-  padding,
-  shapes,
 } from "@expo/ui/swift-ui/modifiers";
 import { useTheme } from "@react-navigation/native";
 import { Image as ExpoImage } from "expo-image";
@@ -108,12 +104,6 @@ export default function RecordingItem({ item, onDeleted }: Props) {
           <VStack
             alignment="leading"
             modifiers={[
-              padding({ all: 8 }),
-              frame({ width: 100, height: 100, alignment: "topLeading" }),
-              background(
-                theme.colors.card,
-                shapes.roundedRectangle({ cornerRadius: 11 }),
-              ),
               aspectRatio({ ratio: 1, contentMode: "fit" }),
               clipShape("roundedRectangle", 11),
               onTapGesture(pressHandler),

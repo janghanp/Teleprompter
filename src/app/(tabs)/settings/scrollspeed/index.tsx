@@ -1,5 +1,11 @@
 import { TabBarContext } from "@/context/TabBarContext";
-import { Host, Slider, Text as SwiftText } from "@expo/ui/swift-ui";
+import {
+  Host,
+  Slider,
+  Spacer,
+  Text as SwiftText,
+  VStack,
+} from "@expo/ui/swift-ui";
 import { useTheme } from "@react-navigation/native";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -107,17 +113,22 @@ export default function ScrollSpeedScreen() {
         </View>
 
         <Host matchContents style={styles.sliderHost}>
-          <Slider
-            value={scrollSpeedValue}
-            min={1}
-            max={10}
-            step={0.5}
-            label={<SwiftText>Speed</SwiftText>}
-            minimumValueLabel={<SwiftText>1</SwiftText>}
-            maximumValueLabel={<SwiftText>10</SwiftText>}
-            onValueChange={setScrollSpeedValue}
-            modifiers={[]}
-          />
+          <VStack>
+            <SwiftText>Scroll Speed</SwiftText>
+            <Spacer />
+            <Spacer />
+            <Slider
+              value={scrollSpeedValue}
+              min={1}
+              max={10}
+              step={0.5}
+              label={<SwiftText>Speed</SwiftText>}
+              minimumValueLabel={<SwiftText>1</SwiftText>}
+              maximumValueLabel={<SwiftText>10</SwiftText>}
+              onValueChange={setScrollSpeedValue}
+              modifiers={[]}
+            />
+          </VStack>
         </Host>
       </SafeAreaView>
     </>
