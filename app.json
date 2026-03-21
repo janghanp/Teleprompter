@@ -8,7 +8,7 @@
     "scheme": "teleprompter",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "com.anonymous.Teleprompter"
+      "bundleIdentifier": "com.mobile.teleprompter"
     },
     "android": {
       "adaptiveIcon": {
