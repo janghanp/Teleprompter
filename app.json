@@ -8,7 +8,10 @@
     "scheme": "teleprompter",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "com.mobile.teleprompter"
+      "bundleIdentifier": "com.mobile.teleprompter",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +20,18 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.INTERNET",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.ACCESS_MEDIA_LOCATION",
+        "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.READ_MEDIA_IMAGES"
+      ]
     },
     "web": {
       "output": "static",
@@ -28,12 +42,8 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#232323",
+          "backgroundColor": "#FFFFFF",
           "image": "./assets/images/app_icon.png",
-          // "dark": {
-          //   "image": "./assets/images/splash-icon-dark.png",
-          //   "backgroundColor": "#000000"
-          // },
           "imageWidth": 200
         }
       ],
@@ -100,6 +110,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "156f916f-a6c4-4c2d-8d28-dde4c5ccc2a9"
+      }
     }
   }
 }
