@@ -2,6 +2,7 @@ import TempVideo from "@/components/TempVideo";
 import { TabBarContext } from "@/context/TabBarContext";
 import { useGetScriptById } from "@/hooks/useGetScriptById";
 import { formatTime } from "@/utils";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   CameraMode,
   CameraType,
@@ -22,11 +23,21 @@ import {
   Button,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 
 export default function CameraViewScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -46,6 +57,24 @@ export default function CameraViewScreen() {
   );
   const recordingTimeRef = useRef<NodeJS.Timeout | null>(null);
   const [currentRecordingTime, setCurrentRecordingTime] = useState(0);
+
+  const overlayHeight = useSharedValue(300);
+  const startHeight = useSharedValue(300);
+
+  const overlayStyle = useAnimatedStyle(() => ({
+    height: overlayHeight.value,
+  }));
+
+  const pan = Gesture.Pan()
+    .onBegin(() => {
+      startHeight.value = overlayHeight.value;
+    })
+    .onUpdate((e) => {
+      overlayHeight.value = Math.max(
+        100,
+        Math.min(startHeight.value + e.translationY, 800),
+      );
+    });
 
   useEffect(() => {
     if (!permission || !permission.granted) {
@@ -165,7 +194,7 @@ export default function CameraViewScreen() {
   const lineHeight = Math.round(fontSize * 1.4);
 
   return (
-    <>
+    <GestureHandlerRootView>
       <Stack.Toolbar placement="left">
         <Stack.Toolbar.Button
           icon={"chevron.left"}
@@ -222,29 +251,54 @@ export default function CameraViewScreen() {
             responsiveOrientationWhenOrientationLocked
           />
         </View>
+
         {/* Script overlay */}
         {script && (
-          <View style={styles.scriptOverlay}>
-            <ScrollView
-              ref={scrollRef}
-              showsVerticalScrollIndicator={true}
-              contentContainerStyle={styles.scriptScrollContent}
-              scrollEventThrottle={16}
-              onScroll={handleScriptScroll}
-            >
-              <Text style={[styles.scriptText, { fontSize, lineHeight }]}>
-                {script[0]?.content}
-              </Text>
-            </ScrollView>
-          </View>
+          <>
+            <Animated.View style={[styles.scriptOverlay, overlayStyle]}>
+              <ScrollView
+                ref={scrollRef}
+                showsVerticalScrollIndicator={true}
+                contentContainerStyle={styles.scriptScrollContent}
+                scrollEventThrottle={16}
+                onScroll={handleScriptScroll}
+              >
+                <Text style={[styles.scriptText, { fontSize, lineHeight }]}>
+                  {script[0]?.content}
+                </Text>
+              </ScrollView>
+
+              <GestureDetector gesture={pan}>
+                <View
+                  style={{
+                    right: 4,
+                    bottom: 4,
+                    position: "absolute",
+                    width: 40,
+                    height: 40,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(0, 0, 0, 0.45)",
+                    borderRadius: 10,
+                  }}
+                >
+                  <Pressable>
+                    <Ionicons name="resize" size={35} color={"white"} />
+                  </Pressable>
+                </View>
+              </GestureDetector>
+            </Animated.View>
+          </>
         )}
+
         {currentVideoUri && (
           <View style={styles.tempVideoWrapper}>
             <TempVideo tempVideoUri={currentVideoUri!} />
           </View>
         )}
       </View>
-    </>
+    </GestureHandlerRootView>
   );
 }
 
@@ -292,13 +346,14 @@ const styles = StyleSheet.create({
   },
   scriptOverlay: {
     position: "absolute",
-    top: 20,
+    top: 30,
     left: 0,
     right: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     borderRadius: 12,
     padding: 16,
-    maxHeight: "40%",
+    height: 300,
+    maxHeight: "50%",
   },
   scriptText: {
     color: "#fff",
