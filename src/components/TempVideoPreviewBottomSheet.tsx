@@ -1,8 +1,5 @@
 import { BottomSheet, Group, Host, RNHostView } from "@expo/ui/swift-ui";
-import {
-  glassEffect,
-  presentationDragIndicator,
-} from "@expo/ui/swift-ui/modifiers";
+import { presentationDragIndicator } from "@expo/ui/swift-ui/modifiers";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { Dispatch } from "react";
 import { StyleSheet, View } from "react-native";
@@ -22,21 +19,10 @@ export default function TempVideoPreviewBottomSheet({
     instance.play();
   });
 
-  console.log(tempVideoUri);
-
   return (
-    <Host style={{ flex: 1 }}>
+    <Host>
       <BottomSheet isPresented={isOpen} onIsPresentedChange={setIsOpen}>
-        <Group
-          modifiers={[
-            glassEffect({
-              glass: { variant: "regular", tint: "#ffffff55" },
-              shape: "roundedRectangle",
-              cornerRadius: 16,
-            }),
-            presentationDragIndicator("visible"),
-          ]}
-        >
+        <Group modifiers={[presentationDragIndicator("visible")]}>
           <RNHostView matchContents>
             <View style={styles.sheetContent}>
               <VideoView
