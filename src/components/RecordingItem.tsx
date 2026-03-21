@@ -84,7 +84,7 @@ export default function RecordingItem({ item, onDeleted }: Props) {
   };
 
   return (
-    <Host matchContents>
+    <Host style={styles.host}>
       <ContextMenu>
         <ContextMenu.Items>
           <Button
@@ -126,6 +126,10 @@ export default function RecordingItem({ item, onDeleted }: Props) {
 }
 
 const styles = StyleSheet.create({
+  host: {
+    width: "100%",
+    aspectRatio: 1,
+  },
   thumbnail: {
     width: "100%",
     height: "100%",

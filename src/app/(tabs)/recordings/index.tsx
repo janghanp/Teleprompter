@@ -38,7 +38,11 @@ export default function RecordingsScreen() {
       <View
         style={[
           styles.itemContainer,
-          { width: itemSize, marginRight: isRowEnd ? 0 : COLUMN_GAP },
+          {
+            width: itemSize,
+            height: itemSize,
+            marginRight: isRowEnd ? 0 : COLUMN_GAP,
+          },
         ]}
       >
         <RecordingItem
