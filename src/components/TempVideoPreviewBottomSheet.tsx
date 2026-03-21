@@ -41,16 +41,15 @@ export default function TempVideoPreviewBottomSheet({
 
 const styles = StyleSheet.create({
   sheetContent: {
-    width: "100%",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 12,
     paddingVertical: 24,
-    backgroundColor: "transparent",
+    width: 300,
   },
   video: {
-    width: 250,
-    height: 500,
+    width: 300,
+    height: 600,
     backgroundColor: "#000",
     borderRadius: 12,
   },
