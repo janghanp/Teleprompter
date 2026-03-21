@@ -1,5 +1,6 @@
 import { TabBarContext } from "@/context/TabBarContext";
 import { useGetScriptById } from "@/hooks/useGetScriptById";
+import { useSaveRecording } from "@/hooks/useSaveRecording";
 import {
   CameraMode,
   CameraType,
@@ -30,10 +31,9 @@ export default function CameraViewScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const { script, isScriptLoading, scriptError } = useGetScriptById(Number(id));
   const ref = useRef<any>(null);
-  const [uri, setUri] = useState<string | null>(null);
   const [mode, setMode] = useState<CameraMode>("video");
   const [facing, setFacing] = useState<CameraType>("back");
-  const [isRecording, setIsRecording] = useState(false);
+  const { isRecording, saveRecording, stopRecording } = useSaveRecording();
   const scrollRef = useRef<ScrollView>(null);
   const scrollY = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -64,17 +64,14 @@ export default function CameraViewScreen() {
 
   const recordVideo = async () => {
     if (isRecording) {
-      setIsRecording(false);
-      ref.current?.stopRecording();
+      stopRecording(ref);
       return;
     }
 
     // Keep recording aligned to wherever the user last positioned the script.
     scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
 
-    setIsRecording(true);
-    const video = await ref.current?.recordAsync();
-    console.log({ video });
+    await saveRecording(ref);
   };
 
   const toggleFacing = () => {

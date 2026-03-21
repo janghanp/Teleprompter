@@ -6,9 +6,18 @@ export default function RecordingsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          headerLargeTitleEnabled: true,
           headerTitle: "Recordings",
+          headerLargeTitleEnabled: true,
           headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="[name]"
+        options={{
+          headerTitle: "",
+          headerLargeTitleEnabled: true,
+          headerTransparent: true,
+          headerShown: false,
         }}
       />
     </Stack>

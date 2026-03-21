@@ -1,3 +1,5 @@
+import { VideoThumbnail } from "expo-video";
+
 export interface CreateScriptInput {
   title: string;
   content?: string;
@@ -15,4 +17,12 @@ export interface Script {
   content: string | null;
   createdAt: number;
   updatedAt: number;
+}
+
+export interface RecordingItemType {
+  name: string;
+  uri: string;
+  size: number | null;
+  modified: number | null;
+  thumbnail: VideoThumbnail | null;
 }

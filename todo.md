@@ -1,3 +1,5 @@
-- [] confirmation dialog before deleting (expo ui)
+- [] save recofing video by using expo file system (and the like save to photos or something)
 
-- [] how to compose recording view on script detail screen
+- [] settings page
+  -> font size
+  -> auto sript speed
