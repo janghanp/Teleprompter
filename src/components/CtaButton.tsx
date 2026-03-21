@@ -19,13 +19,12 @@ const styles = StyleSheet.create({
   ctaWrap: {
     marginTop: 24,
     alignItems: "center",
-    paddingBottom: 24,
   },
   ctaButton: {
     width: "100%",
     paddingVertical: 16,
     backgroundColor: "#0B0B0B",
-    borderRadius: 18,
+    borderRadius: 30,
     alignItems: "center",
     shadowColor: "#000000",
     shadowOpacity: 0.2,

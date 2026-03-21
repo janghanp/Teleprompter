@@ -20,17 +20,20 @@ export default function OnBoarding1() {
           contentFit="cover"
         />
       </View>
-      <View style={styles.content}>
-        <Text style={styles.title}>Welcome to{"\n"}Teleprompter</Text>
-        <Text style={styles.subtitle}>
-          Your professional recording{"\n"}companion. Create, record, and share
-          {"\n"}with ease.
-        </Text>
-      </View>
-      <View style={styles.dots}>
-        <View style={[styles.dot, styles.dotActive]} />
-        <View style={styles.dot} />
-        <View style={styles.dot} />
+      <View>
+        <View style={styles.content}>
+          <Text style={styles.title}>Welcome to{"\n"}Teleprompter</Text>
+          <Text style={styles.subtitle}>
+            Your professional recording{"\n"}companion. Create, record, and
+            share
+            {"\n"}with ease.
+          </Text>
+        </View>
+        <View style={styles.dots}>
+          <View style={[styles.dot, styles.dotActive]} />
+          <View style={styles.dot} />
+          <View style={styles.dot} />
+        </View>
       </View>
       <CtaButton title="Continue" pressHandler={pressHandler} />
     </SafeAreaView>
@@ -43,6 +46,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2F3F5",
     paddingHorizontal: 24,
     paddingTop: 12,
+    justifyContent: "space-between",
   },
   heroCard: {
     marginTop: 44,

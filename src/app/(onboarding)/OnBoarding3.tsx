@@ -22,16 +22,19 @@ export default function OnBoarding3() {
           contentFit="cover"
         />
       </View>
-      <View style={styles.content}>
-        <Text style={styles.title}>Save &amp; Share</Text>
-        <Text style={styles.subtitle}>
-          Save your videos in high quality{"\n"}and share anywhere with one tap.
-        </Text>
-      </View>
-      <View style={styles.dots}>
-        <View style={styles.dot} />
-        <View style={styles.dot} />
-        <View style={[styles.dot, styles.dotActive]} />
+      <View>
+        <View style={styles.content}>
+          <Text style={styles.title}>Save &amp; Share</Text>
+          <Text style={styles.subtitle}>
+            Save your videos in high quality{"\n"}and share anywhere with one
+            tap.
+          </Text>
+        </View>
+        <View style={styles.dots}>
+          <View style={styles.dot} />
+          <View style={styles.dot} />
+          <View style={[styles.dot, styles.dotActive]} />
+        </View>
       </View>
       <CtaButton title="Get Started" pressHandler={pressHandler} />
     </SafeAreaView>
@@ -44,6 +47,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2F3F5",
     paddingHorizontal: 24,
     paddingTop: 12,
+    justifyContent: "space-between",
   },
   heroCard: {
     marginTop: 44,
