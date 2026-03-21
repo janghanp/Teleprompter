@@ -1,20 +1,23 @@
+import TempVideo from "@/components/TempVideo";
 import { TabBarContext } from "@/context/TabBarContext";
 import { useGetScriptById } from "@/hooks/useGetScriptById";
-import { useSaveRecording } from "@/hooks/useSaveRecording";
+import { formatTime } from "@/utils";
 import {
   CameraMode,
   CameraType,
   CameraView,
   useCameraPermissions,
 } from "expo-camera";
+import { File, Paths } from "expo-file-system";
 import {
   Stack,
   useFocusEffect,
   useLocalSearchParams,
   useRouter,
 } from "expo-router";
-import { use, useEffect, useRef, useState } from "react";
+import { Activity, use, useEffect, useRef, useState } from "react";
 import {
+  Alert,
   Button,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -29,14 +32,19 @@ export default function CameraViewScreen() {
   const { setIsTabBarHidden } = use(TabBarContext);
   const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
-  const { script, isScriptLoading, scriptError } = useGetScriptById(Number(id));
-  const ref = useRef<any>(null);
-  const [mode, setMode] = useState<CameraMode>("video");
-  const [facing, setFacing] = useState<CameraType>("back");
-  const { isRecording, saveRecording, stopRecording } = useSaveRecording();
+  const { script } = useGetScriptById(Number(id));
+  const cameraRef = useRef<CameraView>(null);
+  const [mode] = useState<CameraMode>("video");
+  const [facing, setFacing] = useState<CameraType>("front");
   const scrollRef = useRef<ScrollView>(null);
   const scrollY = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [currentVideoUri, setCurrentVideoUri] = useState<string | undefined>(
+    undefined,
+  );
+  const recordingTimeRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentRecordingTime, setCurrentRecordingTime] = useState(0);
 
   useEffect(() => {
     if (!permission || !permission.granted) {
@@ -55,32 +63,78 @@ export default function CameraViewScreen() {
         scrollY.current += 1;
         scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
       }, 30); // lower = faster, higher = slower
+
+      recordingTimeRef.current = setInterval(() => {
+        setCurrentRecordingTime((prev) => prev + 1);
+      }, 1000);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+
+      if (recordingTimeRef.current) {
+        clearInterval(recordingTimeRef.current);
+      }
     }
   }, [isRecording]);
 
-  const recordVideo = async () => {
+  const toggleRecordVideo = async () => {
+    // stop the ongoing recording
     if (isRecording) {
-      stopRecording(ref);
+      setIsRecording(false);
+      cameraRef?.current?.stopRecording();
+      setCurrentRecordingTime(0);
       return;
     }
 
-    // Keep recording aligned to wherever the user last positioned the script.
     scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
 
-    await saveRecording(ref);
+    setIsRecording(true);
+    const video = await cameraRef?.current?.recordAsync();
+
+    if (video?.uri) {
+      setCurrentVideoUri(video.uri);
+    }
   };
 
   const toggleFacing = () => {
     setFacing((prev) => (prev === "back" ? "front" : "back"));
   };
 
-  const setupScript = () => {};
+  const cancelHandler = () => {
+    Alert.alert("Delete Video", "Are you sure you want to delete this video?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          setIsRecording(false);
+          setCurrentVideoUri(undefined);
+        },
+      },
+    ]);
+  };
 
-  const goToSettings = () => {};
+  const saveHandler = () => {
+    if (!currentVideoUri) {
+      return;
+    }
+
+    const tempFile = new File(currentVideoUri);
+    const savedFile = new File(
+      Paths.document,
+      `teleprompter_${Date.now()}.mp4`,
+    );
+
+    tempFile.move(savedFile);
+    router.replace("/(tabs)/recordings");
+  };
+
+  const handleScriptScroll = (
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ) => {
+    scrollY.current = event.nativeEvent.contentOffset.y;
+  };
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -99,12 +153,6 @@ export default function CameraViewScreen() {
     );
   }
 
-  const handleScriptScroll = (
-    event: NativeSyntheticEvent<NativeScrollEvent>,
-  ) => {
-    scrollY.current = event.nativeEvent.contentOffset.y;
-  };
-
   return (
     <>
       <Stack.Toolbar placement="left">
@@ -112,31 +160,50 @@ export default function CameraViewScreen() {
           icon={"chevron.left"}
           variant="plain"
           onPress={() => router.back()}
+          hidden={isRecording || !!currentVideoUri}
         />
       </Stack.Toolbar>
+
       <Stack.Toolbar placement="right">
         <Stack.Toolbar.Button
           icon={"camera.rotate"}
           variant="plain"
           onPress={toggleFacing}
+          hidden={isRecording || !!currentVideoUri}
         />
+        <Stack.Toolbar.Button
+          variant="plain"
+          onPress={cancelHandler}
+          hidden={isRecording || !currentVideoUri}
+        >
+          Cancel
+        </Stack.Toolbar.Button>
       </Stack.Toolbar>
+
       <Stack.Toolbar placement="bottom">
-        <Stack.Toolbar.Button icon={"note.text"} />
         <Stack.Toolbar.Spacer />
         <Stack.Toolbar.Button
           icon={isRecording ? "stop.circle.fill" : "play.fill"}
-          tintColor={isRecording ? undefined : "red"}
-          onPress={recordVideo}
+          tintColor={isRecording ? "red" : "black"}
+          onPress={toggleRecordVideo}
         />
         <Stack.Toolbar.Spacer />
-        <Stack.Toolbar.Button icon={"gearshape"} />
+        <Activity mode={!isRecording && currentVideoUri ? "visible" : "hidden"}>
+          <Stack.Toolbar.Button onPress={saveHandler}>
+            Done
+          </Stack.Toolbar.Button>
+        </Activity>
+        <Activity mode={isRecording ? "visible" : "hidden"}>
+          <Stack.Toolbar.Button>
+            {formatTime(currentRecordingTime)}
+          </Stack.Toolbar.Button>
+        </Activity>
       </Stack.Toolbar>
       <View style={styles.container}>
         <View style={styles.cameraContainer}>
           <CameraView
             style={styles.camera}
-            ref={ref}
+            ref={cameraRef}
             mode={mode}
             facing={facing}
             mute={false}
@@ -157,6 +224,11 @@ export default function CameraViewScreen() {
             </ScrollView>
           </View>
         )}
+        {currentVideoUri && (
+          <View style={styles.tempVideoWrapper}>
+            <TempVideo tempVideoUri={currentVideoUri!} />
+          </View>
+        )}
       </View>
     </>
   );
@@ -165,6 +237,7 @@ export default function CameraViewScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: "relative",
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
@@ -218,5 +291,11 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: "700",
     lineHeight: 60,
+  },
+  tempVideoWrapper: {
+    position: "absolute",
+    left: 16,
+    bottom: 16,
+    zIndex: 5,
   },
 });

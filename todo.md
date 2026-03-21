@@ -1,4 +1,4 @@
-- [] save recofing video by using expo file system (and the like save to photos or something)
+- [] another layer page before saveing recordings
 
 - [] settings page
   -> font size
