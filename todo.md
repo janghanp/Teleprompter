@@ -1,5 +1,3 @@
-- [] another layer page before saveing recordings
+- [] refine scroll speed
 
-- [] settings page
-  -> font size
-  -> auto sript speed
+- [] dark theme
