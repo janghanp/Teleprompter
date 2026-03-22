@@ -23,6 +23,12 @@ export default function SettingsScreen() {
               router.push("/(tabs)/settings/scrollspeed");
             }}
           />
+          <Button
+            label="Line Height"
+            onPress={() => {
+              router.push("/(tabs)/settings/lineheight");
+            }}
+          />
         </Section>
       </Form>
     </Host>

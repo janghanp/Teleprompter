@@ -23,6 +23,12 @@ export default function SettingsLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="lineheight"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

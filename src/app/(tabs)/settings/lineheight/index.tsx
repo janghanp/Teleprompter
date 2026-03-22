@@ -13,23 +13,24 @@ import { use, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function FontSizeScreen() {
+export default function LineHeightScreen() {
   const theme = useTheme();
   const router = useRouter();
   const { setIsTabBarHidden } = use(TabBarContext);
-  const [fontSizeValue, setFontSizeValue] = useState(2);
+  const [fontSizeInitialValue, setFontSizeInitialValue] = useState(2);
   const [lineHeightValue, setLineHeightValue] = useState(1.4);
 
   useEffect(() => {
     (async () => {
       const fontSizeValueFromAsync = await asyncStorage.getItem("fontSize");
       const parsed = Number(fontSizeValueFromAsync);
-      setFontSizeValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 2);
+      setFontSizeInitialValue(
+        Number.isFinite(parsed) && parsed > 0 ? parsed : 2,
+      );
     })();
 
     (async () => {
-      const lineHeightValueFromAsync =
-        await asyncStorage.getItem("lineHeight");
+      const lineHeightValueFromAsync = await asyncStorage.getItem("lineHeight");
       const parsed = Number(lineHeightValueFromAsync);
       setLineHeightValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 1.4);
     })();
@@ -40,7 +41,7 @@ export default function FontSizeScreen() {
     return () => setIsTabBarHidden(false);
   });
 
-  const fontSize = 10 + fontSizeValue * 4;
+  const fontSize = 10 + fontSizeInitialValue * 4;
   const lineHeight = Math.round(fontSize * lineHeightValue);
 
   return (
@@ -78,20 +79,20 @@ export default function FontSizeScreen() {
 
         <Host style={styles.sliderHost}>
           <VStack>
-            <SwiftText>Font Size</SwiftText>
+            <SwiftText>Line Height</SwiftText>
             <Spacer />
             <Spacer />
             <Slider
-              value={fontSizeValue}
+              value={lineHeightValue}
               min={1}
-              max={10}
-              step={1}
-              label={<SwiftText>Size</SwiftText>}
-              minimumValueLabel={<SwiftText>1</SwiftText>}
-              maximumValueLabel={<SwiftText>10</SwiftText>}
+              max={5}
+              step={0.1}
+              label={<SwiftText>Height</SwiftText>}
+              minimumValueLabel={<SwiftText>1.0</SwiftText>}
+              maximumValueLabel={<SwiftText>5.0</SwiftText>}
               onValueChange={(value) => {
-                setFontSizeValue(value);
-                asyncStorage.setItem("fontSize", value.toString());
+                setLineHeightValue(value);
+                asyncStorage.setItem("lineHeight", value.toString());
               }}
             />
           </VStack>

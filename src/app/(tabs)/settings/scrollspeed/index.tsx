@@ -26,6 +26,7 @@ export default function ScrollSpeedScreen() {
   const { setIsTabBarHidden } = use(TabBarContext);
   const [fontSizeInitialValue, setFontSizeInitialValue] = useState(0);
   const [scrollSpeedValue, setScrollSpeedValue] = useState(2);
+  const [lineHeightValue, setLineHeightValue] = useState(1.4);
   const scrollRef = useRef<ScrollView>(null);
   const scrollY = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -46,6 +47,13 @@ export default function ScrollSpeedScreen() {
         await asyncStorage.getItem("scrollSpeed");
       const parsed = Number(scrollSpeedValueFromAsync);
       setScrollSpeedValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 2);
+    })();
+
+    (async () => {
+      const lineHeightValueFromAsync =
+        await asyncStorage.getItem("lineHeight");
+      const parsed = Number(lineHeightValueFromAsync);
+      setLineHeightValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 1.4);
     })();
   }, []);
 
@@ -86,7 +94,7 @@ export default function ScrollSpeedScreen() {
   };
 
   const fontSize = 10 + Number(fontSizeInitialValue) * 4;
-  const lineHeight = Math.round(fontSize * 1.4);
+  const lineHeight = Math.round(fontSize * lineHeightValue);
 
   return (
     <>

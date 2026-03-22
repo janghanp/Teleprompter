@@ -66,6 +66,7 @@ export default function CameraViewScreen() {
   }));
   const [fontSizeInitialValue, setFontSizeInitialValue] = useState(0);
   const [scrollSpeedInitialValue, setScrollSpeedInitialValue] = useState(2);
+  const [lineHeightValue, setLineHeightValue] = useState(1.4);
 
   const pan = Gesture.Pan()
     .onBegin(() => {
@@ -88,6 +89,13 @@ export default function CameraViewScreen() {
       const scrollSpeedValueFromAsync =
         await asyncStorage.getItem("scrollSpeed");
       setScrollSpeedInitialValue(Number(scrollSpeedValueFromAsync) || 0);
+    })();
+
+    (async () => {
+      const lineHeightValueFromAsync =
+        await asyncStorage.getItem("lineHeight");
+      const parsed = Number(lineHeightValueFromAsync);
+      setLineHeightValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 1.4);
     })();
   }, []);
 
@@ -203,7 +211,7 @@ export default function CameraViewScreen() {
   }
 
   const fontSize = 10 + Number(fontSizeInitialValue) * 4;
-  const lineHeight = Math.round(fontSize * 1.4);
+  const lineHeight = Math.round(fontSize * lineHeightValue);
 
   return (
     <GestureHandlerRootView>
