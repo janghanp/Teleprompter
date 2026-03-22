@@ -13,14 +13,15 @@ import {
   useWindowDimensions,
 } from "react-native";
 
-const GRID_COLUMNS = 3;
-const COLUMN_GAP = 12;
-const ROW_GAP = 20;
-const LIST_PADDING = 16;
+const PORTRAIT_COLUMNS = 3;
+const LANDSCAPE_COLUMNS = 4;
+const BASE_COLUMN_GAP = 12;
+const BASE_ROW_GAP = 20;
+const BASE_LIST_PADDING = 16;
 
 export default function ScriptsScreen() {
   const theme = useTheme();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const { createScript } = useCreateScript();
   const {
     scripts,
@@ -30,8 +31,13 @@ export default function ScriptsScreen() {
     refetchScripts,
   } = useGetAllScripts();
 
+  const isLandscape = width > height;
+  const gridColumns = isLandscape ? LANDSCAPE_COLUMNS : PORTRAIT_COLUMNS;
+  const columnGap = isLandscape ? 8 : BASE_COLUMN_GAP;
+  const rowGap = isLandscape ? 12 : BASE_ROW_GAP;
+  const listPadding = isLandscape ? 12 : BASE_LIST_PADDING;
   const itemSize =
-    (width - LIST_PADDING * 2 - COLUMN_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
+    (width - listPadding * 2 - columnGap * (gridColumns - 1)) / gridColumns;
 
   const pressHandler = () => {
     Alert.prompt("New Script", "Enter a name of the new script", [
@@ -51,7 +57,7 @@ export default function ScriptsScreen() {
   };
 
   const renderItem = ({ item, index }: { item: Script; index: number }) => {
-    const isRowEnd = (index + 1) % GRID_COLUMNS === 0;
+    const isRowEnd = (index + 1) % gridColumns === 0;
     const titleText = (item.title ?? "").trim();
     const title =
       titleText.length > 20 ? `${titleText.slice(0, 20)}...` : titleText;
@@ -60,7 +66,12 @@ export default function ScriptsScreen() {
       <View
         style={[
           styles.itemContainer,
-          { width: itemSize, marginRight: isRowEnd ? 0 : COLUMN_GAP },
+          {
+            width: itemSize,
+            marginRight: isRowEnd ? 0 : columnGap,
+            justifyContent: "center",
+            alignItems: "center",
+          },
         ]}
       >
         <ScriptItem script={item} />
@@ -96,10 +107,14 @@ export default function ScriptsScreen() {
         contentInsetAdjustmentBehavior="automatic"
         data={scriptItems}
         keyExtractor={(item) => String(item.id)}
-        numColumns={GRID_COLUMNS}
+        numColumns={gridColumns}
+        key={`scripts-grid-${gridColumns}`}
         renderItem={renderItem}
-        columnWrapperStyle={styles.columnWrapper}
-        contentContainerStyle={styles.listContent}
+        columnWrapperStyle={[styles.columnWrapper, { marginBottom: rowGap }]}
+        contentContainerStyle={[
+          styles.listContent,
+          { padding: listPadding, paddingBottom: listPadding + 80 },
+        ]}
         refreshing={isScriptsRefreshing}
         onRefresh={refetchScripts}
         ListEmptyComponent={
@@ -113,13 +128,9 @@ export default function ScriptsScreen() {
 }
 
 const styles = StyleSheet.create({
-  listContent: {
-    padding: LIST_PADDING,
-    paddingBottom: LIST_PADDING + 80,
-  },
+  listContent: {},
   columnWrapper: {
     justifyContent: "flex-start",
-    marginBottom: ROW_GAP,
   },
   itemContainer: {
     flexGrow: 0,

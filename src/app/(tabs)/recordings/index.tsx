@@ -10,17 +10,25 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const GRID_COLUMNS = 3;
+const PORTRAIT_COLUMNS = 3;
+const LANDSCAPE_COLUMNS = 4;
 const COLUMN_GAP = 12;
 const ROW_GAP = 20;
 const LIST_PADDING = 16;
 
 export default function RecordingsScreen() {
+  const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
+  const gridColumns = isLandscape ? LANDSCAPE_COLUMNS : PORTRAIT_COLUMNS;
+  const paddingLeft = LIST_PADDING + (isLandscape ? insets.left : 0);
+  const paddingRight = LIST_PADDING + (isLandscape ? insets.right : 0);
+  const availableWidth = width - paddingLeft - paddingRight;
   const itemSize =
-    (width - LIST_PADDING * 2 - COLUMN_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
+    (availableWidth - COLUMN_GAP * (gridColumns - 1)) / gridColumns;
   const { recordings, recordingsError, isRecordingsLoading, loadRecordings } =
     useLoadRecordings();
 
@@ -31,7 +39,7 @@ export default function RecordingsScreen() {
     item: RecordingItemType;
     index: number;
   }) => {
-    const isRowEnd = (index + 1) % GRID_COLUMNS === 0;
+    const isRowEnd = (index + 1) % gridColumns === 0;
     const modifiedLabel = formatModified(item.modified) || "Unknown date";
 
     return (
@@ -40,7 +48,6 @@ export default function RecordingsScreen() {
           styles.itemContainer,
           {
             width: itemSize,
-            height: itemSize,
             marginRight: isRowEnd ? 0 : COLUMN_GAP,
           },
         ]}
@@ -76,10 +83,14 @@ export default function RecordingsScreen() {
         contentInsetAdjustmentBehavior="automatic"
         data={recordings}
         keyExtractor={(item) => item.uri}
-        numColumns={GRID_COLUMNS}
+        numColumns={gridColumns}
+        key={`recordings-grid-${gridColumns}`}
         renderItem={renderItem}
         columnWrapperStyle={styles.columnWrapper}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingLeft, paddingRight },
+        ]}
         refreshing={isRecordingsLoading}
         onRefresh={() => {
           void loadRecordings();
@@ -101,10 +112,10 @@ const styles = StyleSheet.create({
   },
   columnWrapper: {
     justifyContent: "flex-start",
-    marginBottom: ROW_GAP,
   },
   itemContainer: {
     flexGrow: 0,
+    marginBottom: ROW_GAP,
   },
   emptyText: {
     color: "#8A8A8A",
