@@ -13,6 +13,7 @@ import {
   clipShape,
   onTapGesture,
 } from "@expo/ui/swift-ui/modifiers";
+import { useEvent } from "expo";
 import { Image as ExpoImage } from "expo-image";
 import { Album, Asset, requestPermissionsAsync } from "expo-media-library/next";
 import { useRouter } from "expo-router";
@@ -27,22 +28,27 @@ interface Props {
 
 export default function RecordingItem({ item, onDeleted }: Props) {
   const router = useRouter();
-  const player = useVideoPlayer(item.uri);
+  const videoPlayer = useVideoPlayer(item.uri);
   const [liveThumbnail, setLiveThumbnail] = useState<string | null>(null);
   const { deleteRecording, isDeletingRecording } = useDeleteRecording();
+  const { status } = useEvent(videoPlayer, "statusChange", {
+    status: videoPlayer.status,
+  });
 
   useEffect(() => {
-    const test = async () => {
-      try {
-        const [thumb] = await player.generateThumbnailsAsync(0.5);
-        setLiveThumbnail(thumb as unknown as string);
-      } catch (e) {
-        console.warn("Thumbnail generation failed", e);
-      }
-    };
+    if (status == "readyToPlay") {
+      loadThumbnail();
+    }
+  }, [status]);
 
-    test();
-  }, [player, item.thumbnail]);
+  const loadThumbnail = async () => {
+    try {
+      const [thumb] = await videoPlayer.generateThumbnailsAsync(0.5);
+      setLiveThumbnail(thumb as unknown as string);
+    } catch (e) {
+      console.warn("Thumbnail generation failed", e);
+    }
+  };
 
   const pressHandler = () => {
     router.push({
@@ -127,7 +133,7 @@ export default function RecordingItem({ item, onDeleted }: Props) {
                 )}
                 <View style={styles.previewDuration}>
                   <Text style={styles.previewDurationText}>
-                    {formatTime(player.duration)}
+                    {formatTime(videoPlayer.duration)}
                   </Text>
                 </View>
               </View>
