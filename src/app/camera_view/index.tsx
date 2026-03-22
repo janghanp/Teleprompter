@@ -397,11 +397,19 @@ export default function CameraViewScreen() {
           ]}
           onPress={toggleRecordVideo}
         >
-          <Ionicons
-            name={isRecording ? "pause" : "play"}
-            size={26}
-            color="#fff"
-          />
+          {isRecording && (
+            <Ionicons name={"square"} size={30} color="#e60000" />
+          )}
+          {!isRecording && (
+            <View
+              style={{
+                width: 50,
+                height: 50,
+                backgroundColor: "#e60000",
+                borderRadius: 100,
+              }}
+            ></View>
+          )}
         </Pressable>
       </View>
 
@@ -505,10 +513,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   playButton: {
-    backgroundColor: "rgba(34, 197, 94, 0.9)",
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
   },
   pauseButton: {
-    backgroundColor: "rgba(239, 68, 68, 0.9)",
+    backgroundColor: "rgba(0, 0, 0, 0.45)",
   },
   recordingTimeBadge: {
     position: "absolute",
