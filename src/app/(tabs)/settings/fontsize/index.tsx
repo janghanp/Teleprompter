@@ -10,13 +10,24 @@ import {
 import { useTheme } from "@react-navigation/native";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
 import { use, useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function FontSizeScreen() {
   const theme = useTheme();
   const router = useRouter();
   const { setIsTabBarHidden } = use(TabBarContext);
+  const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
   const [fontSizeValue, setFontSizeValue] = useState(2);
   const [lineHeightValue, setLineHeightValue] = useState(1.4);
 
@@ -28,8 +39,7 @@ export default function FontSizeScreen() {
     })();
 
     (async () => {
-      const lineHeightValueFromAsync =
-        await asyncStorage.getItem("lineHeight");
+      const lineHeightValueFromAsync = await asyncStorage.getItem("lineHeight");
       const parsed = Number(lineHeightValueFromAsync);
       setLineHeightValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 1.4);
     })();
@@ -42,6 +52,18 @@ export default function FontSizeScreen() {
 
   const fontSize = 10 + fontSizeValue * 4;
   const lineHeight = Math.round(fontSize * lineHeightValue);
+  const availableWidth = Math.max(0, width - insets.left - insets.right);
+  const isLandscape = width > height;
+  const columnGap = 16;
+  const halfWidth = isLandscape
+    ? Math.max(0, (availableWidth - columnGap) / 2)
+    : availableWidth;
+  const overlayPositionStyle = isLandscape
+    ? { left: insets.left, width: halfWidth }
+    : { left: 0, right: 0 };
+  const sliderPositionStyle = isLandscape
+    ? { left: insets.left + halfWidth + columnGap, right: insets.right }
+    : { left: 24, right: 24 };
 
   return (
     <>
@@ -53,9 +75,23 @@ export default function FontSizeScreen() {
         />
       </Stack.Toolbar>
       <SafeAreaView
-        style={[styles.screen, { backgroundColor: theme.colors.card }]}
+        style={[
+          styles.screen,
+          {
+            backgroundColor: theme.colors.card,
+          },
+        ]}
       >
-        <View style={styles.scriptOverlay}>
+        <View
+          style={[
+            styles.scriptOverlay,
+            overlayPositionStyle,
+            {
+              maxHeight: isLandscape ? "100%" : "50%",
+              top: isLandscape ? 10 : 20,
+            },
+          ]}
+        >
           <ScrollView
             showsVerticalScrollIndicator={true}
             contentContainerStyle={styles.scriptScrollContent}
@@ -76,7 +112,7 @@ export default function FontSizeScreen() {
           </ScrollView>
         </View>
 
-        <Host style={styles.sliderHost}>
+        <Host style={[styles.sliderHost, sliderPositionStyle]}>
           <VStack>
             <SwiftText>Font Size</SwiftText>
             <Spacer />
@@ -114,8 +150,6 @@ const styles = StyleSheet.create({
   scriptOverlay: {
     position: "absolute",
     top: 20,
-    left: 0,
-    right: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     borderRadius: 12,
     padding: 16,
@@ -130,8 +164,6 @@ const styles = StyleSheet.create({
   sliderHost: {
     position: "absolute",
     height: 60,
-    left: 24,
-    right: 24,
     bottom: 60,
   },
 });

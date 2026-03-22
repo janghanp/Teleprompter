@@ -16,14 +16,20 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function ScrollSpeedScreen() {
   const theme = useTheme();
   const router = useRouter();
   const { setIsTabBarHidden } = use(TabBarContext);
+  const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
   const [fontSizeInitialValue, setFontSizeInitialValue] = useState(0);
   const [scrollSpeedValue, setScrollSpeedValue] = useState(2);
   const [lineHeightValue, setLineHeightValue] = useState(1.4);
@@ -50,8 +56,7 @@ export default function ScrollSpeedScreen() {
     })();
 
     (async () => {
-      const lineHeightValueFromAsync =
-        await asyncStorage.getItem("lineHeight");
+      const lineHeightValueFromAsync = await asyncStorage.getItem("lineHeight");
       const parsed = Number(lineHeightValueFromAsync);
       setLineHeightValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 1.4);
     })();
@@ -95,6 +100,18 @@ export default function ScrollSpeedScreen() {
 
   const fontSize = 10 + Number(fontSizeInitialValue) * 4;
   const lineHeight = Math.round(fontSize * lineHeightValue);
+  const availableWidth = Math.max(0, width - insets.left - insets.right);
+  const isLandscape = width > height;
+  const columnGap = 16;
+  const halfWidth = isLandscape
+    ? Math.max(0, (availableWidth - columnGap) / 2)
+    : availableWidth;
+  const overlayPositionStyle = isLandscape
+    ? { left: insets.left, width: halfWidth }
+    : { left: 0, right: 0 };
+  const sliderPositionStyle = isLandscape
+    ? { left: insets.left + halfWidth + columnGap, right: insets.right }
+    : { left: 24, right: 24 };
 
   return (
     <>
@@ -108,7 +125,16 @@ export default function ScrollSpeedScreen() {
       <SafeAreaView
         style={[styles.screen, { backgroundColor: theme.colors.card }]}
       >
-        <View style={styles.scriptOverlay}>
+        <View
+          style={[
+            styles.scriptOverlay,
+            overlayPositionStyle,
+            {
+              maxHeight: isLandscape ? "100%" : "50%",
+              top: isLandscape ? 10 : 20,
+            },
+          ]}
+        >
           <ScrollView
             ref={scrollRef}
             showsVerticalScrollIndicator={true}
@@ -131,7 +157,7 @@ export default function ScrollSpeedScreen() {
           </ScrollView>
         </View>
 
-        <Host style={styles.sliderHost}>
+        <Host style={[styles.sliderHost, sliderPositionStyle]}>
           <VStack>
             <SwiftText>Scroll Speed</SwiftText>
             <Spacer />
@@ -167,8 +193,6 @@ const styles = StyleSheet.create({
   scriptOverlay: {
     position: "absolute",
     top: 20,
-    left: 0,
-    right: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     borderRadius: 12,
     padding: 16,
@@ -183,8 +207,6 @@ const styles = StyleSheet.create({
   sliderHost: {
     position: "absolute",
     height: 60,
-    left: 24,
-    right: 24,
     bottom: 60,
   },
 });
