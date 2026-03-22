@@ -1,8 +1,8 @@
 import TempVideo from "@/components/TempVideo";
 import { TabBarContext } from "@/context/TabBarContext";
 import { useGetScriptById } from "@/hooks/useGetScriptById";
-import { formatTime } from "@/utils";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useTheme } from "@react-navigation/native";
 import {
   CameraMode,
   CameraType,
@@ -17,7 +17,7 @@ import {
   useRouter,
 } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { Activity, use, useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Button,
@@ -40,6 +40,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 export default function CameraViewScreen() {
+  const theme = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { setIsTabBarHidden } = use(TabBarContext);
   const router = useRouter();
@@ -220,7 +221,7 @@ export default function CameraViewScreen() {
         </Stack.Toolbar.Button>
       </Stack.Toolbar>
 
-      <Stack.Toolbar placement="bottom">
+      {/* <Stack.Toolbar placement="bottom">
         <Stack.Toolbar.Spacer />
         <Stack.Toolbar.Button
           icon={isRecording ? "stop.circle.fill" : "play.fill"}
@@ -238,7 +239,8 @@ export default function CameraViewScreen() {
             {formatTime(currentRecordingTime)}
           </Stack.Toolbar.Button>
         </Activity>
-      </Stack.Toolbar>
+      </Stack.Toolbar> */}
+
       <View style={styles.container}>
         <View style={styles.cameraContainer}>
           <CameraView
@@ -306,7 +308,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: "relative",
-    backgroundColor: "#fff",
+    backgroundColor: "white",
     alignItems: "center",
     justifyContent: "center",
   },

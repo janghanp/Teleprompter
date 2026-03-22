@@ -15,9 +15,7 @@ export default function TempVideoPreviewBottomSheet({
   setIsOpen,
   tempVideoUri,
 }: Props) {
-  const player = useVideoPlayer(tempVideoUri, (instance) => {
-    instance.play();
-  });
+  const player = useVideoPlayer(tempVideoUri, (instance) => {});
 
   return (
     <Host>

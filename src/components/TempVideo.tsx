@@ -1,9 +1,9 @@
+import TempVideoPreviewBottomSheet from "@/components/TempVideoPreviewBottomSheet";
 import { formatTime } from "@/utils";
 import { Image } from "expo-image";
 import { createVideoPlayer, type VideoThumbnail } from "expo-video";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import TempVideoPreviewBottomSheet from "./TempVideoPreviewBottomSheet";
 
 interface Props {
   tempVideoUri: string;
@@ -22,15 +22,21 @@ export default function TempVideo({ tempVideoUri }: Props) {
       try {
         await player.replaceAsync(tempVideoUri);
 
+        console.log({ tempVideoUri });
+
         const [thumb] = await player.generateThumbnailsAsync(0.5, {
           maxWidth: 240,
         });
+
+        console.log({ thumb });
 
         if (!cancelled) {
           setThumbnail(thumb ?? null);
           setDuration(Math.round(player.duration));
         }
       } catch (error) {
+        console.log(error);
+
         if (!cancelled) {
           setThumbnail(null);
         }
@@ -44,6 +50,7 @@ export default function TempVideo({ tempVideoUri }: Props) {
 
     return () => {
       cancelled = true;
+      player.release();
     };
   }, [tempVideoUri]);
 
