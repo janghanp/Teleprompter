@@ -1,6 +1,7 @@
 import TempVideo from "@/components/TempVideo";
 import { TabBarContext } from "@/context/TabBarContext";
 import { useGetScriptById } from "@/hooks/useGetScriptById";
+import { formatTime } from "@/utils";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTheme } from "@react-navigation/native";
 import {
@@ -221,26 +222,6 @@ export default function CameraViewScreen() {
         </Stack.Toolbar.Button>
       </Stack.Toolbar>
 
-      {/* <Stack.Toolbar placement="bottom">
-        <Stack.Toolbar.Spacer />
-        <Stack.Toolbar.Button
-          icon={isRecording ? "stop.circle.fill" : "play.fill"}
-          tintColor={isRecording ? "red" : "black"}
-          onPress={toggleRecordVideo}
-        />
-        <Stack.Toolbar.Spacer />
-        <Activity mode={!isRecording && currentVideoUri ? "visible" : "hidden"}>
-          <Stack.Toolbar.Button onPress={saveHandler}>
-            Done
-          </Stack.Toolbar.Button>
-        </Activity>
-        <Activity mode={isRecording ? "visible" : "hidden"}>
-          <Stack.Toolbar.Button>
-            {formatTime(currentRecordingTime)}
-          </Stack.Toolbar.Button>
-        </Activity>
-      </Stack.Toolbar> */}
-
       <View style={styles.container}>
         <View style={styles.cameraContainer}>
           <CameraView
@@ -300,6 +281,30 @@ export default function CameraViewScreen() {
           </View>
         )}
       </View>
+
+      <View style={styles.playPauseWrapper} pointerEvents="box-none">
+        <Pressable
+          style={[
+            styles.playPauseButton,
+            isRecording ? styles.pauseButton : styles.playButton,
+          ]}
+          onPress={toggleRecordVideo}
+        >
+          <Ionicons
+            name={isRecording ? "pause" : "play"}
+            size={26}
+            color="#fff"
+          />
+        </Pressable>
+      </View>
+
+      {isRecording && (
+        <View style={styles.recordingTimeBadge}>
+          <Text style={styles.recordingTimeText}>
+            {formatTime(currentRecordingTime)}
+          </Text>
+        </View>
+      )}
     </GestureHandlerRootView>
   );
 }
@@ -368,5 +373,43 @@ const styles = StyleSheet.create({
     left: 16,
     bottom: 16,
     zIndex: 5,
+  },
+  playPauseWrapper: {
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    zIndex: 10,
+    elevation: 10,
+  },
+  playPauseButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  playButton: {
+    backgroundColor: "rgba(34, 197, 94, 0.9)",
+  },
+  pauseButton: {
+    backgroundColor: "rgba(239, 68, 68, 0.9)",
+  },
+  recordingTimeBadge: {
+    position: "absolute",
+    right: 16,
+    bottom: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.65)",
+    zIndex: 10,
+    elevation: 10,
+  },
+  recordingTimeText: {
+    color: "#fff",
+    fontWeight: "700",
+    letterSpacing: 0.3,
   },
 });
