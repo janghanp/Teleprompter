@@ -298,13 +298,22 @@ export default function CameraViewScreen() {
         </Pressable>
       </View>
 
-      {isRecording && (
+      {isRecording ? (
         <View style={styles.recordingTimeBadge}>
           <Text style={styles.recordingTimeText}>
             {formatTime(currentRecordingTime)}
           </Text>
         </View>
-      )}
+      ) : currentVideoUri ? (
+        <Pressable
+          style={[styles.saveButton, { backgroundColor: theme.colors.card }]}
+          onPress={saveHandler}
+        >
+          <Text style={[styles.saveButtonText, { color: theme.colors.text }]}>
+            Save
+          </Text>
+        </Pressable>
+      ) : null}
     </GestureHandlerRootView>
   );
 }
@@ -411,5 +420,18 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "700",
     letterSpacing: 0.3,
+  },
+  saveButton: {
+    position: "absolute",
+    right: 16,
+    bottom: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 30,
+    zIndex: 10,
+    elevation: 10,
+  },
+  saveButtonText: {
+    fontSize: 20,
   },
 });
