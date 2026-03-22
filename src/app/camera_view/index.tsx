@@ -27,6 +27,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import {
@@ -38,6 +39,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { asyncStorage } from "..";
 
 export default function CameraViewScreen() {
@@ -45,6 +47,8 @@ export default function CameraViewScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { setIsTabBarHidden } = use(TabBarContext);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
   const [permission, requestPermission] = useCameraPermissions();
   const { script } = useGetScriptById(Number(id));
   const cameraRef = useRef<CameraView>(null);
@@ -64,9 +68,14 @@ export default function CameraViewScreen() {
   const overlayStyle = useAnimatedStyle(() => ({
     height: overlayHeight.value,
   }));
+  const handleTranslateY = useSharedValue(0);
+  const handleStartY = useSharedValue(0);
   const [fontSizeInitialValue, setFontSizeInitialValue] = useState(0);
   const [scrollSpeedInitialValue, setScrollSpeedInitialValue] = useState(2);
   const [lineHeightValue, setLineHeightValue] = useState(1.4);
+
+  const handleHeight = 8;
+  const handleBaseBottom = 50;
 
   const pan = Gesture.Pan()
     .onBegin(() => {
@@ -78,6 +87,41 @@ export default function CameraViewScreen() {
         Math.min(startHeight.value + e.translationY, 800),
       );
     });
+
+  const handlePan = Gesture.Pan()
+    .onBegin(() => {
+      handleStartY.value = handleTranslateY.value;
+    })
+    .onUpdate((e) => {
+      const minTranslate = -(
+        overlayHeight.value -
+        handleBaseBottom -
+        handleHeight
+      );
+      const maxTranslate = handleBaseBottom;
+      const nextValue = handleStartY.value + e.translationY;
+      handleTranslateY.value = Math.min(
+        maxTranslate,
+        Math.max(minTranslate, nextValue),
+      );
+    });
+
+  const handleStyle = useAnimatedStyle(() => {
+    const minTranslate = -(
+      overlayHeight.value -
+      handleBaseBottom -
+      handleHeight
+    );
+    const maxTranslate = handleBaseBottom;
+    const clampedTranslate = Math.min(
+      maxTranslate,
+      Math.max(minTranslate, handleTranslateY.value),
+    );
+
+    return {
+      transform: [{ translateY: clampedTranslate }],
+    };
+  });
 
   useEffect(() => {
     (async () => {
@@ -92,8 +136,7 @@ export default function CameraViewScreen() {
     })();
 
     (async () => {
-      const lineHeightValueFromAsync =
-        await asyncStorage.getItem("lineHeight");
+      const lineHeightValueFromAsync = await asyncStorage.getItem("lineHeight");
       const parsed = Number(lineHeightValueFromAsync);
       setLineHeightValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 1.4);
     })();
@@ -212,6 +255,19 @@ export default function CameraViewScreen() {
 
   const fontSize = 10 + Number(fontSizeInitialValue) * 4;
   const lineHeight = Math.round(fontSize * lineHeightValue);
+  const availableWidth = Math.max(0, width - insets.left - insets.right);
+  const isLandscape = width > height;
+  const overlayWidth = isLandscape ? availableWidth / 2 : availableWidth;
+  const overlayPositionStyle = isLandscape
+    ? { left: insets.left, width: overlayWidth }
+    : { left: 0, right: 0 };
+  const rightHalfLeft = insets.left + availableWidth / 2;
+  const playPausePositionStyle = isLandscape
+    ? { left: rightHalfLeft, right: insets.right }
+    : { left: 0, right: 0 };
+  const tempVideoPositionStyle = isLandscape
+    ? { left: rightHalfLeft + 16 }
+    : { left: 16 };
 
   return (
     <GestureHandlerRootView>
@@ -256,7 +312,18 @@ export default function CameraViewScreen() {
         {/* Script overlay */}
         {script && (
           <>
-            <Animated.View style={[styles.scriptOverlay, overlayStyle]}>
+            <Animated.View
+              style={[
+                styles.scriptOverlay,
+                overlayStyle,
+                {
+                  ...overlayPositionStyle,
+                  top: isLandscape ? 10 : 30,
+                  height: "auto",
+                  maxHeight: isLandscape ? "95%" : "70%",
+                },
+              ]}
+            >
               <ScrollView
                 ref={scrollRef}
                 showsVerticalScrollIndicator={true}
@@ -289,18 +356,40 @@ export default function CameraViewScreen() {
                   </Pressable>
                 </View>
               </GestureDetector>
+              <GestureDetector gesture={handlePan}>
+                <Animated.View
+                  style={[
+                    {
+                      left: 0,
+                      right: 0,
+                      bottom: handleBaseBottom,
+                      position: "absolute",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: handleHeight,
+                      backgroundColor: "rgba(250, 128, 114, 0.45)",
+                      borderRadius: 10,
+                    },
+                    handleStyle,
+                  ]}
+                />
+              </GestureDetector>
             </Animated.View>
           </>
         )}
 
         {currentVideoUri && (
-          <View style={styles.tempVideoWrapper}>
+          <View style={[styles.tempVideoWrapper, tempVideoPositionStyle]}>
             <TempVideo tempVideoUri={currentVideoUri!} />
           </View>
         )}
       </View>
 
-      <View style={styles.playPauseWrapper} pointerEvents="box-none">
+      <View
+        style={[styles.playPauseWrapper, playPausePositionStyle]}
+        pointerEvents="box-none"
+      >
         <Pressable
           style={[
             styles.playPauseButton,
@@ -381,8 +470,6 @@ const styles = StyleSheet.create({
   scriptOverlay: {
     position: "absolute",
     top: 30,
-    left: 0,
-    right: 0,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     borderRadius: 12,
     padding: 16,
