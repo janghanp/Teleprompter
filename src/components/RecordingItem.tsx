@@ -1,18 +1,24 @@
 import { useDeleteRecording } from "@/hooks/useDeleteRecording";
+import { formatTime } from "@/utils";
 import { RecordingItemType } from "@/utils/interfaces";
-import { Button, ContextMenu, Host, VStack } from "@expo/ui/swift-ui";
+import {
+  Button,
+  ContextMenu,
+  Host,
+  RNHostView,
+  VStack,
+} from "@expo/ui/swift-ui";
 import {
   aspectRatio,
   clipShape,
   onTapGesture,
 } from "@expo/ui/swift-ui/modifiers";
-import { useTheme } from "@react-navigation/native";
 import { Image as ExpoImage } from "expo-image";
 import { Album, Asset, requestPermissionsAsync } from "expo-media-library/next";
 import { useRouter } from "expo-router";
 import { useVideoPlayer } from "expo-video";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 
 interface Props {
   item: RecordingItemType;
@@ -20,7 +26,6 @@ interface Props {
 }
 
 export default function RecordingItem({ item, onDeleted }: Props) {
-  const theme = useTheme();
   const router = useRouter();
   const player = useVideoPlayer(item.uri);
   const [liveThumbnail, setLiveThumbnail] = useState<string | null>(null);
@@ -109,15 +114,24 @@ export default function RecordingItem({ item, onDeleted }: Props) {
               onTapGesture(pressHandler),
             ]}
           >
-            {liveThumbnail ? (
-              <ExpoImage
-                source={liveThumbnail}
-                style={styles.thumbnail}
-                contentFit="cover"
-              />
-            ) : (
-              <View style={styles.thumbnailPlaceholder} />
-            )}
+            <RNHostView matchContents>
+              <View style={styles.thumbnail}>
+                {liveThumbnail ? (
+                  <ExpoImage
+                    source={liveThumbnail}
+                    style={styles.thumbnail}
+                    contentFit="cover"
+                  />
+                ) : (
+                  <View style={styles.thumbnailPlaceholder} />
+                )}
+                <View style={styles.previewDuration}>
+                  <Text style={styles.previewDurationText}>
+                    {formatTime(player.duration)}
+                  </Text>
+                </View>
+              </View>
+            </RNHostView>
           </VStack>
         </ContextMenu.Trigger>
       </ContextMenu>
@@ -138,5 +152,22 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     backgroundColor: "#1f1f1f",
+  },
+  previewDuration: {
+    width: "60%",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderTopLeftRadius: 10,
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
+    right: 0,
+    bottom: 0,
+    padding: 2,
+  },
+  previewDurationText: {
+    fontSize: 16,
+    color: "white",
   },
 });

@@ -1,7 +1,8 @@
 import TempVideoPreviewBottomSheet from "@/components/TempVideoPreviewBottomSheet";
 import { formatTime } from "@/utils";
+import { useEvent } from "expo";
 import { Image } from "expo-image";
-import { createVideoPlayer, type VideoThumbnail } from "expo-video";
+import { useVideoPlayer, type VideoThumbnail } from "expo-video";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -13,46 +14,31 @@ export default function TempVideo({ tempVideoUri }: Props) {
   const [thumbnail, setThumbnail] = useState<VideoThumbnail | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [duration, setDuration] = useState<number>(0);
+  const videoPlayer = useVideoPlayer(tempVideoUri);
+  const { status } = useEvent(videoPlayer, "statusChange", {
+    status: videoPlayer.status,
+  });
 
   useEffect(() => {
-    let cancelled = false;
-    const player = createVideoPlayer(null);
+    if (status == "readyToPlay") {
+      loadThumbnail();
+    }
+  }, [status]);
 
-    const loadThumbnail = async () => {
-      try {
-        await player.replaceAsync(tempVideoUri);
+  const loadThumbnail = async () => {
+    try {
+      const [thumb] = await videoPlayer.generateThumbnailsAsync(0.5, {
+        maxWidth: 240,
+      });
 
-        console.log({ tempVideoUri });
+      setThumbnail(thumb);
+      setDuration(Math.round(videoPlayer.duration));
+    } catch (error) {
+      console.log(error);
 
-        const [thumb] = await player.generateThumbnailsAsync(0.5, {
-          maxWidth: 240,
-        });
-
-        console.log({ thumb });
-
-        if (!cancelled) {
-          setThumbnail(thumb ?? null);
-          setDuration(Math.round(player.duration));
-        }
-      } catch (error) {
-        console.log(error);
-
-        if (!cancelled) {
-          setThumbnail(null);
-        }
-        console.warn("Failed to generate temp thumbnail", error);
-      } finally {
-        player.release();
-      }
-    };
-
-    void loadThumbnail();
-
-    return () => {
-      cancelled = true;
-      player.release();
-    };
-  }, [tempVideoUri]);
+      console.warn("Failed to generate temp thumbnail", error);
+    }
+  };
 
   const pressHandler = () => {
     setIsOpen(true);

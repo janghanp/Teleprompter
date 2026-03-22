@@ -19,8 +19,9 @@ export const formatBytes = (bytes: number | null) => {
 };
 
 export function formatTime(seconds: number) {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+  const totalSeconds = Math.max(0, Math.round(seconds));
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
 
   return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
