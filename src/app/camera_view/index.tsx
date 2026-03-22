@@ -104,13 +104,13 @@ export default function CameraViewScreen() {
 
   useEffect(() => {
     const speedPxPerSec = 6 + Number(scrollSpeedInitialValue) * 5;
-    const intervalMs = 16;
+    const intervalMs = 50;
     const step = (speedPxPerSec * intervalMs) / 1000;
 
     if (isRecording) {
       intervalRef.current = setInterval(() => {
         scrollY.current += step;
-        scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
+        scrollRef.current?.scrollTo({ y: scrollY.current, animated: true });
       }, intervalMs);
 
       recordingTimeRef.current = setInterval(() => {

@@ -60,12 +60,12 @@ export default function ScrollSpeedScreen() {
     }
 
     const speedPxPerSec = 6 + scrollSpeedValue * 5;
-    const intervalMs = 16;
+    const intervalMs = 50;
     const step = (speedPxPerSec * intervalMs) / 1000;
 
     intervalRef.current = setInterval(() => {
       scrollY.current += step;
-      scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
+      scrollRef.current?.scrollTo({ y: scrollY.current, animated: true });
     }, intervalMs);
 
     return () => {
@@ -123,15 +123,15 @@ export default function ScrollSpeedScreen() {
           </ScrollView>
         </View>
 
-        <Host matchContents style={styles.sliderHost}>
+        <Host style={styles.sliderHost}>
           <VStack>
             <SwiftText>Scroll Speed</SwiftText>
             <Spacer />
             <Spacer />
             <Slider
               value={scrollSpeedValue}
-              min={1}
-              max={20}
+              min={5}
+              max={50}
               step={1}
               label={<SwiftText>Speed</SwiftText>}
               minimumValueLabel={<SwiftText>1</SwiftText>}
@@ -174,6 +174,7 @@ const styles = StyleSheet.create({
   },
   sliderHost: {
     position: "absolute",
+    height: 60,
     left: 24,
     right: 24,
     bottom: 60,

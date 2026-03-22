@@ -68,7 +68,7 @@ export default function FontSizeScreen() {
           </ScrollView>
         </View>
 
-        <Host matchContents style={styles.sliderHost}>
+        <Host style={styles.sliderHost}>
           <VStack>
             <SwiftText>Font Size</SwiftText>
             <Spacer />
@@ -85,7 +85,6 @@ export default function FontSizeScreen() {
                 setFontSizeValue(value);
                 asyncStorage.setItem("fontSize", value.toString());
               }}
-              modifiers={[]}
             />
           </VStack>
         </Host>
@@ -122,6 +121,7 @@ const styles = StyleSheet.create({
   },
   sliderHost: {
     position: "absolute",
+    height: 60,
     left: 24,
     right: 24,
     bottom: 60,
