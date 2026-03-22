@@ -1,3 +1,4 @@
+import { asyncStorage } from "@/app";
 import { TabBarContext } from "@/context/TabBarContext";
 import {
   Host,
@@ -8,7 +9,6 @@ import {
 } from "@expo/ui/swift-ui";
 import { useTheme } from "@react-navigation/native";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { use, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,14 +17,15 @@ export default function FontSizeScreen() {
   const theme = useTheme();
   const router = useRouter();
   const { setIsTabBarHidden } = use(TabBarContext);
-  const fontSizeInitialValue = SecureStore.getItem("fontSize");
-  const [fontSizeValue, setFontSizeValue] = useState(
-    Number(fontSizeInitialValue) || 2,
-  );
+  const [fontSizeValue, setFontSizeValue] = useState(2);
 
   useEffect(() => {
-    SecureStore.setItem("fontSize", fontSizeValue.toString());
-  }, [fontSizeValue]);
+    (async () => {
+      const fontSizeValueFromAsync = await asyncStorage.getItem("fontSize");
+      const parsed = Number(fontSizeValueFromAsync);
+      setFontSizeValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 2);
+    })();
+  }, []);
 
   useFocusEffect(() => {
     setIsTabBarHidden(true);
@@ -80,7 +81,10 @@ export default function FontSizeScreen() {
               label={<SwiftText>Size</SwiftText>}
               minimumValueLabel={<SwiftText>1</SwiftText>}
               maximumValueLabel={<SwiftText>10</SwiftText>}
-              onValueChange={setFontSizeValue}
+              onValueChange={(value) => {
+                setFontSizeValue(value);
+                asyncStorage.setItem("fontSize", value.toString());
+              }}
               modifiers={[]}
             />
           </VStack>

@@ -1,13 +1,15 @@
+import { createAsyncStorage } from "@react-native-async-storage/async-storage";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import * as SQLite from "expo-sqlite";
 import { useEffect } from "react";
 import migrations from "../../drizzle/migrations";
 
 const expo = SQLite.openDatabaseSync("db.db");
 export const db = drizzle(expo);
+
+export const asyncStorage = createAsyncStorage("preferenceDB");
 
 export default function Index() {
   const router = useRouter();
@@ -27,7 +29,7 @@ export default function Index() {
 
   useEffect(() => {
     (async () => {
-      const onboardingCompleted = await SecureStore.getItemAsync(
+      const onboardingCompleted = await asyncStorage.getItem(
         "onboardingCompleted",
       );
 

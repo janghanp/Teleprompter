@@ -17,7 +17,6 @@ import {
   useLocalSearchParams,
   useRouter,
 } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { use, useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -39,6 +38,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { asyncStorage } from "..";
 
 export default function CameraViewScreen() {
   const theme = useTheme();
@@ -59,13 +59,13 @@ export default function CameraViewScreen() {
   );
   const recordingTimeRef = useRef<NodeJS.Timeout | null>(null);
   const [currentRecordingTime, setCurrentRecordingTime] = useState(0);
-
   const overlayHeight = useSharedValue(300);
   const startHeight = useSharedValue(300);
-
   const overlayStyle = useAnimatedStyle(() => ({
     height: overlayHeight.value,
   }));
+  const [fontSizeInitialValue, setFontSizeInitialValue] = useState(0);
+  const [scrollSpeedInitialValue, setScrollSpeedInitialValue] = useState(2);
 
   const pan = Gesture.Pan()
     .onBegin(() => {
@@ -79,6 +79,19 @@ export default function CameraViewScreen() {
     });
 
   useEffect(() => {
+    (async () => {
+      const fontSizeValueFromAsync = await asyncStorage.getItem("fontSize");
+      setFontSizeInitialValue(Number(fontSizeValueFromAsync) || 0);
+    })();
+
+    (async () => {
+      const scrollSpeedValueFromAsync =
+        await asyncStorage.getItem("scrollSpeed");
+      setScrollSpeedInitialValue(Number(scrollSpeedValueFromAsync) || 0);
+    })();
+  }, []);
+
+  useEffect(() => {
     if (!permission || !permission.granted) {
       requestPermission();
     }
@@ -90,8 +103,6 @@ export default function CameraViewScreen() {
   });
 
   useEffect(() => {
-    const scrollSpeedInitialValue = SecureStore.getItem("scrollSpeed");
-
     const speedPxPerSec = 6 + Number(scrollSpeedInitialValue) * 5;
     const intervalMs = 16;
     const step = (speedPxPerSec * intervalMs) / 1000;
@@ -114,7 +125,7 @@ export default function CameraViewScreen() {
         clearInterval(recordingTimeRef.current);
       }
     }
-  }, [isRecording]);
+  }, [isRecording, scrollSpeedInitialValue]);
 
   const toggleRecordVideo = async () => {
     // stop the ongoing recording
@@ -191,7 +202,6 @@ export default function CameraViewScreen() {
     );
   }
 
-  const fontSizeInitialValue = SecureStore.getItem("fontSize");
   const fontSize = 10 + Number(fontSizeInitialValue) * 4;
   const lineHeight = Math.round(fontSize * 1.4);
 

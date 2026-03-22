@@ -1,3 +1,4 @@
+import { asyncStorage } from "@/app";
 import { TabBarContext } from "@/context/TabBarContext";
 import {
   Host,
@@ -8,7 +9,6 @@ import {
 } from "@expo/ui/swift-ui";
 import { useTheme } from "@react-navigation/native";
 import { Stack, useFocusEffect, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { use, useEffect, useRef, useState } from "react";
 import {
   NativeScrollEvent,
@@ -24,11 +24,8 @@ export default function ScrollSpeedScreen() {
   const theme = useTheme();
   const router = useRouter();
   const { setIsTabBarHidden } = use(TabBarContext);
-  const fontSizeInitialValue = SecureStore.getItem("fontSize");
-  const scrollSpeedInitialValue = SecureStore.getItem("scrollSpeed");
-  const [scrollSpeedValue, setScrollSpeedValue] = useState(
-    Number(scrollSpeedInitialValue) || 2,
-  );
+  const [fontSizeInitialValue, setFontSizeInitialValue] = useState(0);
+  const [scrollSpeedValue, setScrollSpeedValue] = useState(2);
   const scrollRef = useRef<ScrollView>(null);
   const scrollY = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -37,6 +34,20 @@ export default function ScrollSpeedScreen() {
     setIsTabBarHidden(true);
     return () => setIsTabBarHidden(false);
   });
+
+  useEffect(() => {
+    (async () => {
+      const fontSizeValueFromAsync = await asyncStorage.getItem("fontSize");
+      setFontSizeInitialValue(Number(fontSizeValueFromAsync) || 0);
+    })();
+
+    (async () => {
+      const scrollSpeedValueFromAsync =
+        await asyncStorage.getItem("scrollSpeed");
+      const parsed = Number(scrollSpeedValueFromAsync);
+      setScrollSpeedValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 2);
+    })();
+  }, []);
 
   useEffect(() => {
     if (!scrollSpeedValue) {
@@ -65,7 +76,7 @@ export default function ScrollSpeedScreen() {
   }, [scrollSpeedValue]);
 
   useEffect(() => {
-    SecureStore.setItem("scrollSpeed", scrollSpeedValue.toString());
+    asyncStorage.setItem("scrollSpeed", scrollSpeedValue.toString());
   }, [scrollSpeedValue]);
 
   const handleScriptScroll = (
