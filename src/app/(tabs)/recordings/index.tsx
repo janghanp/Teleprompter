@@ -80,6 +80,10 @@ export default function RecordingsScreen() {
         renderItem={renderItem}
         columnWrapperStyle={styles.columnWrapper}
         contentContainerStyle={styles.listContent}
+        refreshing={isRecordingsLoading}
+        onRefresh={() => {
+          void loadRecordings();
+        }}
         ListEmptyComponent={
           statusMessage ? (
             <Text style={styles.emptyText}>{statusMessage}</Text>

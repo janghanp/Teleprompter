@@ -22,7 +22,14 @@ export default function ScriptsScreen() {
   const theme = useTheme();
   const { width } = useWindowDimensions();
   const { createScript } = useCreateScript();
-  const { scripts, scriptsError, isScriptsLoading } = useGetAllScripts();
+  const {
+    scripts,
+    scriptsError,
+    isScriptsLoading,
+    isScriptsRefreshing,
+    refetchScripts,
+  } = useGetAllScripts();
+
   const itemSize =
     (width - LIST_PADDING * 2 - COLUMN_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
 
@@ -93,6 +100,8 @@ export default function ScriptsScreen() {
         renderItem={renderItem}
         columnWrapperStyle={styles.columnWrapper}
         contentContainerStyle={styles.listContent}
+        refreshing={isScriptsRefreshing}
+        onRefresh={refetchScripts}
         ListEmptyComponent={
           statusMessage ? (
             <Text style={styles.emptyText}>{statusMessage}</Text>

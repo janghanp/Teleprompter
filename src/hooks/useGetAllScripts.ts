@@ -2,7 +2,7 @@ import { getAllScripts } from "@/utils/apis";
 import { useQuery } from "@tanstack/react-query";
 
 export function useGetAllScripts() {
-  const { data, error, isLoading } = useQuery({
+  const { data, error, isLoading, isRefetching, refetch } = useQuery({
     queryKey: ["scripts"],
     queryFn: getAllScripts,
   });
@@ -11,5 +11,7 @@ export function useGetAllScripts() {
     scripts: data,
     isScriptsLoading: isLoading,
     scriptsError: error,
+    isScriptsRefreshing: isRefetching,
+    refetchScripts: refetch,
   };
 }
