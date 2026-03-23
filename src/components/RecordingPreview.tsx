@@ -4,13 +4,22 @@ import { useEvent } from "expo";
 import { Image } from "expo-image";
 import { useVideoPlayer, type VideoThumbnail } from "expo-video";
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface Props {
   tempVideoUri: string;
 }
 
-export default function TempVideo({ tempVideoUri }: Props) {
+export default function RecordingPreview({ tempVideoUri }: Props) {
+  const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const [thumbnail, setThumbnail] = useState<VideoThumbnail | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [duration, setDuration] = useState<number>(0);
@@ -20,10 +29,10 @@ export default function TempVideo({ tempVideoUri }: Props) {
   });
 
   useEffect(() => {
-    if (status == "readyToPlay") {
-      loadThumbnail();
+    if (tempVideoUri && status == "readyToPlay") {
+      void loadThumbnail();
     }
-  }, [status]);
+  }, [status, tempVideoUri]);
 
   const loadThumbnail = async () => {
     try {
@@ -44,28 +53,39 @@ export default function TempVideo({ tempVideoUri }: Props) {
     setIsOpen(true);
   };
 
+  const isLandscape = width > height;
+  const leftMargin = insets.left + (isLandscape ? 0 : 16);
+
   return (
-    <View style={styles.container}>
-      {thumbnail ? (
-        <Pressable onPress={pressHandler}>
-          <Image source={thumbnail} style={styles.video} contentFit="cover" />
-        </Pressable>
-      ) : (
-        <View style={styles.placeholder} />
-      )}
-      <View style={styles.previewDuration}>
-        <Text style={styles.previewDurationText}>{formatTime(duration)}</Text>
+    <View style={[styles.tempVideoWrapper, { left: leftMargin }]}>
+      <View style={styles.container}>
+        {thumbnail ? (
+          <Pressable onPress={pressHandler}>
+            <Image source={thumbnail} style={styles.video} contentFit="cover" />
+          </Pressable>
+        ) : (
+          <View style={styles.placeholder} />
+        )}
+        <View style={styles.previewDuration}>
+          <Text style={styles.previewDurationText}>{formatTime(duration)}</Text>
+        </View>
+        <TempVideoPreviewBottomSheet
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          tempVideoUri={tempVideoUri}
+        />
       </View>
-      <TempVideoPreviewBottomSheet
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        tempVideoUri={tempVideoUri}
-      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  tempVideoWrapper: {
+    position: "absolute",
+    left: 16,
+    bottom: 16,
+    zIndex: 5,
+  },
   container: {
     position: "relative",
     width: 112,

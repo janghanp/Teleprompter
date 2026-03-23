@@ -11,13 +11,11 @@ export default function TabLayout() {
       <NativeTabs
         hidden={isTabBarHidden}
         labelStyle={{
-          // For the text color
           color: DynamicColorIOS({
             dark: "white",
             light: "black",
           }),
         }}
-        // For the selected icon color
         tintColor={DynamicColorIOS({
           dark: "white",
           light: "black",
