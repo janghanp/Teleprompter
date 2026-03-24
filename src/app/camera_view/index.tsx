@@ -206,7 +206,6 @@ export default function CameraViewScreen() {
           Cancel
         </Stack.Toolbar.Button>
       </Stack.Toolbar>
-
       <View style={styles.container}>
         <View style={styles.cameraContainer}>
           <CameraView
@@ -216,36 +215,31 @@ export default function CameraViewScreen() {
             facing={facing}
             mute={false}
             mirror={facing === "front"}
+            videoQuality={"2160p"}
             focusable
             responsiveOrientationWhenOrientationLocked
           />
         </View>
-
         <ScriptOverlay
           script={script?.[0].content || ""}
           fontSize={fontSize}
           lineHeight={lineHeight}
         />
-
         {currentVideoUri && <RecordingPreview tempVideoUri={currentVideoUri} />}
       </View>
-
       {/* record and pause buttons*/}
       <View style={[styles.playPauseWrapper, playPausePositionStyle]}>
         <Activity mode={!isRecording ? "visible" : "hidden"}>
           <RecordButton pressHandler={recordHandler} />
         </Activity>
-
         <Activity mode={isRecording ? "visible" : "hidden"}>
           <PauseButton pressHandler={pauseHandler} />
         </Activity>
       </View>
-
       {/* Recording time */}
       <Activity mode={isRecording ? "visible" : "hidden"}>
         <RecordingTimeBadge currentRecordingTime={currentRecordingTime} />
       </Activity>
-
       {/* Save button*/}
       <Activity mode={!isRecording && currentVideoUri ? "visible" : "hidden"}>
         <RecordingSaveButton saveHandler={saveHandler} />
