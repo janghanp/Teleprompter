@@ -53,6 +53,7 @@ export default function CameraViewScreen() {
   const [fontSizeInitialValue, setFontSizeInitialValue] = useState(0);
   const [scrollSpeedInitialValue, setScrollSpeedInitialValue] = useState(2);
   const [lineHeightValue, setLineHeightValue] = useState(1.4);
+  const [scriptBackgroundOpacity, setScriptBackgroundOpacity] = useState(0.5);
 
   // hide the tab bar
   useFocusEffect(() => {
@@ -78,6 +79,14 @@ export default function CameraViewScreen() {
       const parsed = Number(lineHeightValueFromAsync);
       setLineHeightValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 1.4);
     })();
+
+    (async () => {
+      const opacityFromAsync = await asyncStorage.getItem(
+        "scriptBackgroundOpacity",
+      );
+      const parsed = Number(opacityFromAsync);
+      setScriptBackgroundOpacity(parsed);
+    })();
   }, []);
 
   // ask permission to use camera
@@ -89,7 +98,7 @@ export default function CameraViewScreen() {
 
   // on and off auto-scrolling
   useEffect(() => {
-    const speedPxPerSec = 6 + Number(scrollSpeedInitialValue) * 5;
+    const speedPxPerSec = 6 + Number(scrollSpeedInitialValue) * 10;
     const intervalMs = 50;
     const step = (speedPxPerSec * intervalMs) / 1000;
 
@@ -224,6 +233,9 @@ export default function CameraViewScreen() {
           script={script?.[0].content || ""}
           fontSize={fontSize}
           lineHeight={lineHeight}
+          backgroundOpacity={scriptBackgroundOpacity}
+          scrollRef={scrollRef}
+          scrollY={scrollY}
         />
         {currentVideoUri && <RecordingPreview tempVideoUri={currentVideoUri} />}
       </View>

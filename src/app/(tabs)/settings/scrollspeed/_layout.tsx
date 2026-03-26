@@ -6,9 +6,7 @@ export default function ScrollSpeedLayout() {
       <Stack.Screen
         name="index"
         options={{
-          headerLargeTitleEnabled: true,
-          headerTitle: "",
-          headerTransparent: true,
+          headerShown: false,
         }}
       />
     </Stack>

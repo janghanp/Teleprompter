@@ -1,18 +1,36 @@
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
+import { useEffect } from "react";
 
-export default function Indicator() {
+interface Props {
+  currentScriptOverlayHeight: number;
+}
+
+export default function ScriptIndicator({ currentScriptOverlayHeight }: Props) {
   const handleStartY = useSharedValue(0);
   const handleTranslateY = useSharedValue(0);
   const overlayHeight = useSharedValue(300);
-  const handleHeight = 8;
+  const handleHeight = 15;
   const handleBaseBottom = 50;
+
+  useEffect(() => {
+    if (currentScriptOverlayHeight) {
+      overlayHeight.value = currentScriptOverlayHeight;
+    }
+  }, [currentScriptOverlayHeight]);
 
   const pan = Gesture.Pan()
     .onBegin(() => {
       handleStartY.value = handleTranslateY.value;
     })
     .onUpdate((e) => {
+      if (e.absoluteY < 150) {
+        return;
+      }
+
       const minTranslate = -(
         overlayHeight.value -
         handleBaseBottom -
@@ -56,8 +74,9 @@ export default function Indicator() {
             justifyContent: "center",
             alignItems: "center",
             height: handleHeight,
-            backgroundColor: "rgba(250, 128, 114, 0.45)",
+            backgroundColor: "rgba(255, 255, 255, 0.45)",
             borderRadius: 10,
+            zIndex: 20,
           },
           handleStyle,
         ]}

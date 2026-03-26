@@ -1,12 +1,10 @@
-- [x] slower auto scroll
+- [x] add the script overlay opacity option
 
-- [x] indicator on the script overlay
+- [] indicator option
 
-- [x] line spacing option
+- [] preference options on the camera view
 
-- [x] play and pause buttons style
+- [] make the script overlay draggable
 
-- [x] landscape mode
-      -> (x) layout for scripts and recordings
-      -> (x) show the script overlay on the left with safe inset area
-      -> (x) preview on settings page
+- [] camera view focus (react-native-vision-camera)
+

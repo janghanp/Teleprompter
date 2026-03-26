@@ -12,21 +12,21 @@ export default function SettingsLayout() {
         }}
       />
       <Stack.Screen
-        name="fontsize"
+        name="script"
         options={{
-          headerShown: false,
+          headerLargeTitleEnabled: true,
+          headerTitle: "",
+          headerTransparent: true,
+          headerBackButtonDisplayMode: "minimal",
         }}
       />
       <Stack.Screen
         name="scrollspeed"
         options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="lineheight"
-        options={{
-          headerShown: false,
+          headerLargeTitleEnabled: true,
+          headerTitle: "",
+          headerTransparent: true,
+          headerBackButtonDisplayMode: "minimal",
         }}
       />
     </Stack>

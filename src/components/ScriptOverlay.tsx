@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRef } from "react";
+import { Ref, RefObject, useRef, useState } from "react";
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -19,25 +19,34 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { scheduleOnUI, runOnJS } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Indicator from "@/components/Indicator";
+import ScriptIndicator from "@/components/ScriptIndicator";
 
 interface Props {
   script: string;
   fontSize: number;
   lineHeight: number;
+  backgroundOpacity: number;
+  scrollRef: RefObject<ScrollView | null>;
+  scrollY: RefObject<number>;
 }
 
-export default function ScriptOverlay({ script, fontSize, lineHeight }: Props) {
+export default function ScriptOverlay({
+  script,
+  fontSize,
+  lineHeight,
+  backgroundOpacity,
+  scrollRef,
+  scrollY,
+}: Props) {
   const insets = useSafeAreaInsets();
-  const scrollRef = useRef<ScrollView>(null);
-  const scrollY = useRef(0);
   const { width, height } = useWindowDimensions();
   const overlayHeight = useSharedValue(300);
   const startHeight = useSharedValue(300);
-  const overlayStyle = useAnimatedStyle(() => ({
-    height: overlayHeight.value,
-  }));
+  const [currentScriptOverlayHeight, setCurrentScriptOverlayHeight] =
+    useState(300);
+  const overlayBackgroundColor = `rgba(0, 0, 0, ${backgroundOpacity * 0.1})`;
 
   const handleScriptScroll = (
     event: NativeSyntheticEvent<NativeScrollEvent>,
@@ -54,7 +63,19 @@ export default function ScriptOverlay({ script, fontSize, lineHeight }: Props) {
         100,
         Math.min(startHeight.value + e.translationY, 800),
       );
+    })
+    .onEnd((e) => {
+      const currentHeight = Math.max(
+        100,
+        Math.min(startHeight.value + e.translationY, 800),
+      );
+
+      runOnJS(setCurrentScriptOverlayHeight)(currentHeight);
     });
+
+  const overlayStyle = useAnimatedStyle(() => ({
+    height: overlayHeight.value,
+  }));
 
   const isLandscape = width > height;
   const availableWidth = Math.max(0, width - insets.left - insets.right);
@@ -72,8 +93,9 @@ export default function ScriptOverlay({ script, fontSize, lineHeight }: Props) {
           {
             ...overlayPositionStyle,
             top: isLandscape ? 10 : 30,
-            height: "auto",
+            height: 300,
             maxHeight: isLandscape ? "95%" : "70%",
+            backgroundColor: overlayBackgroundColor,
           },
         ]}
       >
@@ -101,6 +123,7 @@ export default function ScriptOverlay({ script, fontSize, lineHeight }: Props) {
               alignItems: "center",
               backgroundColor: "rgba(0, 0, 0, 0.45)",
               borderRadius: 10,
+              zIndex: 10,
             }}
           >
             <Pressable>
@@ -108,7 +131,9 @@ export default function ScriptOverlay({ script, fontSize, lineHeight }: Props) {
             </Pressable>
           </View>
         </GestureDetector>
-        <Indicator />
+        <ScriptIndicator
+          currentScriptOverlayHeight={currentScriptOverlayHeight}
+        />
       </Animated.View>
     </GestureHandlerRootView>
   );
@@ -134,11 +159,10 @@ const styles = StyleSheet.create({
   scriptOverlay: {
     position: "absolute",
     top: 30,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     borderRadius: 12,
     padding: 16,
     height: 300,
-    maxHeight: "50%",
+    maxHeight: "70%",
   },
   scriptText: {
     color: "#fff",
