@@ -1,13 +1,17 @@
 import { asyncStorage } from "@/app";
 import { TabBarContext } from "@/context/TabBarContext";
 import {
+  Button,
   Form,
+  Group,
   Host,
+  HStack,
   Section,
   Slider,
   Spacer,
   Text as SwiftText,
   VStack,
+  Image,
 } from "@expo/ui/swift-ui";
 import { useTheme } from "@react-navigation/native";
 import { useFocusEffect } from "expo-router";
@@ -23,6 +27,15 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import {
+  background,
+  buttonStyle,
+  frame,
+  padding,
+  shapes,
+} from "@expo/ui/swift-ui/modifiers";
+import ScriptIndicator from "@/components/ScriptIndicator";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function SettingsScriptScreen() {
   const theme = useTheme();
@@ -33,6 +46,9 @@ export default function SettingsScriptScreen() {
   const [fontSizeValue, setFontSizeValue] = useState(2);
   const [lineHeightValue, setLineHeightValue] = useState(1.4);
   const [backgroundOpacityValue, setBackgroundOpacityValue] = useState(0.2);
+  const [indicatorValue0, setIndicatorValue0] = useState(false);
+  const [indicatorValue1, setIndicatorValue1] = useState(false);
+  const [indicatorValue2, setIndicatorValue2] = useState(false);
 
   // hide tab bar
   useFocusEffect(() => {
@@ -64,6 +80,30 @@ export default function SettingsScriptScreen() {
       const parsed = Number(opacityFromAsync);
 
       setBackgroundOpacityValue(parsed);
+    })();
+
+    (async () => {
+      const indicatorValueFromAsync = await asyncStorage.getItem(
+        "scriptIndicatorStyle0",
+      );
+
+      setIndicatorValue0(!!indicatorValueFromAsync);
+    })();
+
+    (async () => {
+      const indicatorValueFromAsync = await asyncStorage.getItem(
+        "scriptIndicatorStyle1",
+      );
+
+      setIndicatorValue1(!!indicatorValueFromAsync);
+    })();
+
+    (async () => {
+      const indicatorValueFromAsync = await asyncStorage.getItem(
+        "scriptIndicatorStyle2",
+      );
+
+      setIndicatorValue2(!!indicatorValueFromAsync);
     })();
   }, []);
 
@@ -124,8 +164,17 @@ export default function SettingsScriptScreen() {
             versions of Lorem Ipsum.
           </Text>
         </ScrollView>
+        <GestureHandlerRootView>
+          <View style={{ position: "absolute", left: -16, right: -16 }}>
+            <ScriptIndicator
+              currentScriptOverlayHeight={200}
+              leftArrow={indicatorValue0}
+              line={indicatorValue1}
+              rightArrow={indicatorValue2}
+            />
+          </View>
+        </GestureHandlerRootView>
       </View>
-
       <View
         style={[
           styles.sliderContainer,
@@ -196,6 +245,106 @@ export default function SettingsScriptScreen() {
                     );
                   }}
                 />
+              </VStack>
+            </Section>
+            <Section>
+              <VStack alignment={"leading"}>
+                <SwiftText>Indicator</SwiftText>
+                <Spacer />
+                <Spacer />
+                <HStack
+                  spacing={8}
+                  alignment={"center"}
+                  modifiers={[frame({ maxWidth: Infinity })]}
+                >
+                  <Button
+                    onPress={() => {
+                      setIndicatorValue0((prev) => !prev);
+
+                      if (indicatorValue0) {
+                        asyncStorage.removeItem("scriptIndicatorStyle0");
+                      } else {
+                        asyncStorage.setItem("scriptIndicatorStyle0", "true");
+                      }
+                    }}
+                    modifiers={[
+                      buttonStyle(indicatorValue0 ? "glassProminent" : "glass"),
+                      frame({ maxWidth: 9999 }),
+                    ]}
+                  >
+                    <HStack
+                      alignment="center"
+                      modifiers={[
+                        padding({ vertical: 6, horizontal: 12 }),
+                        frame({
+                          height: 32,
+                          maxWidth: 9999,
+                          alignment: "center",
+                        }),
+                      ]}
+                    >
+                      <Image systemName={"chevron.right"} size={16} />
+                    </HStack>
+                  </Button>
+                  <Button
+                    onPress={() => {
+                      setIndicatorValue1((prev) => !prev);
+
+                      if (indicatorValue1) {
+                        asyncStorage.removeItem("scriptIndicatorStyle1");
+                      } else {
+                        asyncStorage.setItem("scriptIndicatorStyle1", "true");
+                      }
+                    }}
+                    modifiers={[
+                      buttonStyle(indicatorValue1 ? "glassProminent" : "glass"),
+                      frame({ maxWidth: 9999 }),
+                    ]}
+                  >
+                    <HStack
+                      alignment="center"
+                      modifiers={[
+                        padding({ vertical: 6, horizontal: 12 }),
+                        frame({
+                          height: 32,
+                          maxWidth: 9999,
+                          alignment: "center",
+                        }),
+                      ]}
+                    >
+                      <Image systemName={"minus"} size={16} />
+                    </HStack>
+                  </Button>
+                  <Button
+                    onPress={() => {
+                      setIndicatorValue2((prev) => !prev);
+
+                      if (indicatorValue2) {
+                        asyncStorage.removeItem("scriptIndicatorStyle2");
+                      } else {
+                        asyncStorage.setItem("scriptIndicatorStyle2", "true");
+                      }
+                    }}
+                    modifiers={[
+                      buttonStyle(indicatorValue2 ? "glassProminent" : "glass"),
+                      frame({ maxWidth: 9999 }),
+                    ]}
+                  >
+                    <HStack
+                      alignment="center"
+                      modifiers={[
+                        padding({ vertical: 6, horizontal: 12 }),
+                        frame({
+                          height: 32,
+                          maxWidth: 9999,
+                          alignment: "center",
+                        }),
+                      ]}
+                    >
+                      <Image systemName={"chevron.left"} size={16} />
+                    </HStack>
+                  </Button>
+                </HStack>
               </VStack>
             </Section>
           </Form>

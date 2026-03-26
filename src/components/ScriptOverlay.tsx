@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Ref, RefObject, useRef, useState } from "react";
+import { Ref, RefObject, useEffect, useRef, useState } from "react";
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -22,6 +22,7 @@ import Animated, {
 import { scheduleOnUI, runOnJS } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ScriptIndicator from "@/components/ScriptIndicator";
+import { asyncStorage } from "@/app";
 
 interface Props {
   script: string;
@@ -44,9 +45,37 @@ export default function ScriptOverlay({
   const { width, height } = useWindowDimensions();
   const overlayHeight = useSharedValue(300);
   const startHeight = useSharedValue(300);
+  const [indicatorValue0, setIndicatorValue0] = useState(false);
+  const [indicatorValue1, setIndicatorValue1] = useState(false);
+  const [indicatorValue2, setIndicatorValue2] = useState(false);
   const [currentScriptOverlayHeight, setCurrentScriptOverlayHeight] =
     useState(300);
-  const overlayBackgroundColor = `rgba(0, 0, 0, ${backgroundOpacity * 0.1})`;
+
+  useEffect(() => {
+    (async () => {
+      const indicatorValueFromAsync = await asyncStorage.getItem(
+        "scriptIndicatorStyle0",
+      );
+
+      setIndicatorValue0(!!indicatorValueFromAsync);
+    })();
+
+    (async () => {
+      const indicatorValueFromAsync = await asyncStorage.getItem(
+        "scriptIndicatorStyle1",
+      );
+
+      setIndicatorValue1(!!indicatorValueFromAsync);
+    })();
+
+    (async () => {
+      const indicatorValueFromAsync = await asyncStorage.getItem(
+        "scriptIndicatorStyle2",
+      );
+
+      setIndicatorValue2(!!indicatorValueFromAsync);
+    })();
+  }, []);
 
   const handleScriptScroll = (
     event: NativeSyntheticEvent<NativeScrollEvent>,
@@ -77,6 +106,7 @@ export default function ScriptOverlay({
     height: overlayHeight.value,
   }));
 
+  const overlayBackgroundColor = `rgba(0, 0, 0, ${backgroundOpacity * 0.1})`;
   const isLandscape = width > height;
   const availableWidth = Math.max(0, width - insets.left - insets.right);
   const overlayWidth = isLandscape ? availableWidth / 2 : availableWidth;
@@ -133,6 +163,9 @@ export default function ScriptOverlay({
         </GestureDetector>
         <ScriptIndicator
           currentScriptOverlayHeight={currentScriptOverlayHeight}
+          leftArrow={indicatorValue0}
+          line={indicatorValue1}
+          rightArrow={indicatorValue2}
         />
       </Animated.View>
     </GestureHandlerRootView>

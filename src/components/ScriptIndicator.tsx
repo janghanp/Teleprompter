@@ -3,13 +3,21 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import { useEffect } from "react";
+import { Activity, useEffect } from "react";
 
 interface Props {
   currentScriptOverlayHeight: number;
+  leftArrow: boolean;
+  line: boolean;
+  rightArrow: boolean;
 }
 
-export default function ScriptIndicator({ currentScriptOverlayHeight }: Props) {
+export default function ScriptIndicator({
+  currentScriptOverlayHeight,
+  leftArrow,
+  line,
+  rightArrow,
+}: Props) {
   const handleStartY = useSharedValue(0);
   const handleTranslateY = useSharedValue(0);
   const overlayHeight = useSharedValue(300);
@@ -62,25 +70,77 @@ export default function ScriptIndicator({ currentScriptOverlayHeight }: Props) {
   });
 
   return (
-    <GestureDetector gesture={pan}>
-      <Animated.View
-        style={[
-          {
-            left: 0,
-            right: 0,
-            bottom: handleBaseBottom,
-            position: "absolute",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: handleHeight,
-            backgroundColor: "rgba(255, 255, 255, 0.45)",
-            borderRadius: 10,
-            zIndex: 20,
-          },
-          handleStyle,
-        ]}
-      />
-    </GestureDetector>
+    <>
+      <Activity mode={leftArrow ? "visible" : "hidden"}>
+        <GestureDetector gesture={pan}>
+          <Animated.View
+            style={[
+              {
+                left: 0,
+                position: "absolute",
+                bottom: handleBaseBottom - 17,
+                width: 0,
+                height: 0,
+                backgroundColor: "transparent",
+                borderTopWidth: 25,
+                borderBottomWidth: 25,
+                borderLeftWidth: 25,
+                borderTopColor: "transparent",
+                borderBottomColor: "transparent",
+                borderLeftColor: "rgba(255, 255, 255, 0.45)",
+                zIndex: 20,
+              },
+              handleStyle,
+            ]}
+          />
+        </GestureDetector>
+      </Activity>
+      <Activity mode={line ? "visible" : "hidden"}>
+        <GestureDetector gesture={pan}>
+          <Animated.View
+            style={[
+              {
+                left: 0,
+                right: 0,
+                bottom: handleBaseBottom,
+                position: "absolute",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: handleHeight,
+                backgroundColor: "rgba(255, 255, 255, 0.45)",
+                borderRadius: 10,
+                zIndex: 20,
+              },
+              handleStyle,
+            ]}
+          />
+        </GestureDetector>
+      </Activity>
+      <Activity mode={rightArrow ? "visible" : "hidden"}>
+        <GestureDetector gesture={pan}>
+          <Animated.View
+            style={[
+              {
+                right: 0,
+                position: "absolute",
+                bottom: handleBaseBottom - 17,
+                width: 0,
+                height: 0,
+                backgroundColor: "transparent",
+                borderTopWidth: 25,
+                borderBottomWidth: 25,
+                borderRightWidth: 25,
+                borderTopColor: "transparent",
+                borderBottomColor: "transparent",
+                borderRightColor: "rgba(255, 255, 255, 0.45)",
+                zIndex: 20,
+              },
+              handleStyle,
+            ]}
+          />
+        </GestureDetector>
+      </Activity>
+    </>
   );
 }
