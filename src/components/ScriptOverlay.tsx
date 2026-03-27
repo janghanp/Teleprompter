@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Ref, RefObject, useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -19,7 +19,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-import { scheduleOnUI, runOnJS } from "react-native-worklets";
+import { runOnJS } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ScriptIndicator from "@/components/ScriptIndicator";
 import { asyncStorage } from "@/app";
@@ -45,6 +45,8 @@ export default function ScriptOverlay({
   const { width, height } = useWindowDimensions();
   const overlayHeight = useSharedValue(300);
   const startHeight = useSharedValue(300);
+  const overlayXCoordinate = useSharedValue(0);
+  const overlayYCoordinate = useSharedValue(0);
   const [indicatorValue0, setIndicatorValue0] = useState(false);
   const [indicatorValue1, setIndicatorValue1] = useState(false);
   const [indicatorValue2, setIndicatorValue2] = useState(false);
@@ -77,13 +79,21 @@ export default function ScriptOverlay({
     })();
   }, []);
 
+  // reset the overlay position whenever the screen mode is changed.
+  useEffect(() => {
+    if (width && height) {
+      overlayXCoordinate.value = 0;
+      overlayYCoordinate.value = 0;
+    }
+  }, [width, height]);
+
   const handleScriptScroll = (
     event: NativeSyntheticEvent<NativeScrollEvent>,
   ) => {
     scrollY.current = event.nativeEvent.contentOffset.y;
   };
 
-  const pan = Gesture.Pan()
+  const resizePan = Gesture.Pan()
     .onBegin(() => {
       startHeight.value = overlayHeight.value;
     })
@@ -102,9 +112,47 @@ export default function ScriptOverlay({
       runOnJS(setCurrentScriptOverlayHeight)(currentHeight);
     });
 
+  const movePan = Gesture.Pan().onChange((e) => {
+    const isLandscape = width > height;
+
+    if (isLandscape) {
+      const leftXPosition = insets.left + 20;
+      const rightXPosition = (width - insets.right) / 1.5;
+
+      if (e.absoluteX < leftXPosition || e.absoluteX > rightXPosition) {
+        return;
+      }
+
+      overlayXCoordinate.value += e.changeX;
+    }
+
+    const topYPosition = (height - insets.top) * 0.4;
+    const bottomYPosition =
+      (height - insets.bottom) * (isLandscape ? 0.95 : 0.9);
+
+    if (e.absoluteY > bottomYPosition || e.absoluteY < topYPosition) {
+      return;
+    }
+
+    overlayYCoordinate.value += e.changeY;
+  });
+
   const overlayStyle = useAnimatedStyle(() => ({
     height: overlayHeight.value,
   }));
+
+  const overlayContainerStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateX: overlayXCoordinate.value,
+        },
+        {
+          translateY: overlayYCoordinate.value,
+        },
+      ],
+    };
+  });
 
   const overlayBackgroundColor = `rgba(0, 0, 0, ${backgroundOpacity * 0.1})`;
   const isLandscape = width > height;
@@ -120,6 +168,7 @@ export default function ScriptOverlay({
         style={[
           styles.scriptOverlay,
           overlayStyle,
+          overlayContainerStyle,
           {
             ...overlayPositionStyle,
             top: isLandscape ? 10 : 30,
@@ -140,7 +189,29 @@ export default function ScriptOverlay({
             {script}
           </Text>
         </ScrollView>
-        <GestureDetector gesture={pan}>
+        <GestureDetector gesture={movePan}>
+          <View
+            style={{
+              left: 4,
+              bottom: 4,
+              position: "absolute",
+              width: 40,
+              height: 40,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.45)",
+              borderRadius: 10,
+              zIndex: 10,
+            }}
+          >
+            <Pressable>
+              <Ionicons name="move" size={30} color={"white"} />
+            </Pressable>
+          </View>
+        </GestureDetector>
+
+        <GestureDetector gesture={resizePan}>
           <View
             style={{
               right: 4,
@@ -157,10 +228,11 @@ export default function ScriptOverlay({
             }}
           >
             <Pressable>
-              <Ionicons name="resize" size={35} color={"white"} />
+              <Ionicons name="resize" size={30} color={"white"} />
             </Pressable>
           </View>
         </GestureDetector>
+
         <ScriptIndicator
           currentScriptOverlayHeight={currentScriptOverlayHeight}
           leftArrow={indicatorValue0}
@@ -196,6 +268,7 @@ const styles = StyleSheet.create({
     padding: 16,
     height: 300,
     maxHeight: "70%",
+    zIndex: 50,
   },
   scriptText: {
     color: "#fff",

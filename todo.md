@@ -1,10 +1,10 @@
 - [x] add the script overlay opacity option
 
-- [] indicator option
+- [x] indicator option
+
+- [x] make the script overlay draggable
 
 - [] preference options on the camera view
-
-- [] make the script overlay draggable
 
 - [] camera view focus (react-native-vision-camera)
 

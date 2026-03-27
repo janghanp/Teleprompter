@@ -21,6 +21,9 @@ export default function RecordButton({ pressHandler }: Props) {
 
 const styles = StyleSheet.create({
   playPauseButton: {
+    position: "absolute",
+    top: -64,
+    zIndex: 100,
     width: 64,
     height: 64,
     borderRadius: 32,

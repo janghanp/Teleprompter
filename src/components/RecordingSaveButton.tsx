@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 8,
     borderRadius: 30,
-    zIndex: 10,
+    zIndex: 100,
     elevation: 10,
   },
   saveButtonText: {
