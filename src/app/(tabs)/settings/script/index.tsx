@@ -11,7 +11,6 @@ import {
   Text as SwiftText,
   VStack,
 } from "@expo/ui/swift-ui";
-import { useTheme } from "@react-navigation/native";
 import { useFocusEffect } from "expo-router";
 import { use } from "react";
 import {
@@ -25,13 +24,17 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import { buttonStyle, frame, padding } from "@expo/ui/swift-ui/modifiers";
+import {
+  background,
+  buttonStyle,
+  frame,
+  padding,
+} from "@expo/ui/swift-ui/modifiers";
 import ScriptIndicator from "@/components/ScriptIndicator";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useMMKVBoolean, useMMKVNumber } from "react-native-mmkv";
 
 export default function SettingsScriptScreen() {
-  const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const { setIsTabBarHidden } = use(TabBarContext);
@@ -70,9 +73,7 @@ export default function SettingsScriptScreen() {
     : { left: 0, right: 0 };
 
   return (
-    <SafeAreaView
-      style={[styles.screen, { backgroundColor: theme.colors.background }]}
-    >
+    <SafeAreaView style={[styles.screen]}>
       <View
         style={[
           styles.scriptOverlay,
@@ -187,7 +188,7 @@ export default function SettingsScriptScreen() {
                 />
               </VStack>
             </Section>
-            <Section>
+            <Section modifiers={[background("clear")]}>
               <VStack alignment={"leading"}>
                 <SwiftText>Indicator</SwiftText>
                 <Spacer />

@@ -39,6 +39,7 @@ export default function PreferenceButton() {
     useMMKVBoolean("scriptIndicatorStyle1");
   const [MMKVScriptIndicatorStyle2, setMMKVScriptIndicatorStyle2] =
     useMMKVBoolean("scriptIndicatorStyle2");
+  const [MMKVScrollSpeed, setMMKVScrollSPeed] = useMMKVNumber("scrollSpeed");
 
   const pressHandler = () => {
     setIsPresented(true);
@@ -218,6 +219,26 @@ export default function PreferenceButton() {
                       </HStack>
                     </Button>
                   </HStack>
+                </VStack>
+              </Section>
+              <Section title={""}>
+                <VStack alignment={"leading"}>
+                  <SwiftText>Scroll Speed</SwiftText>
+                  <Spacer />
+                  <Spacer />
+                  <Slider
+                    value={MMKVScrollSpeed}
+                    min={5}
+                    max={50}
+                    step={1}
+                    label={<SwiftText>Speed</SwiftText>}
+                    minimumValueLabel={<SwiftText>1</SwiftText>}
+                    maximumValueLabel={<SwiftText>10</SwiftText>}
+                    onValueChange={(value) => {
+                      setMMKVScrollSPeed(value);
+                    }}
+                    modifiers={[]}
+                  />
                 </VStack>
               </Section>
             </Section>

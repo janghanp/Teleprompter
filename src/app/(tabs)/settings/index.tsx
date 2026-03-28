@@ -33,11 +33,11 @@ export default function SettingsScreen() {
             <HStack spacing={10}>
               <Image
                 systemName="text.word.spacing"
-                color="white"
+                color={theme.colors.text}
                 size={20}
                 modifiers={[
                   frame({ width: 40, height: 40 }),
-                  background(`${theme.colors.text}`),
+                  background(`${theme.colors.background}`),
                   clipShape("roundedRectangle"),
                 ]}
               />
@@ -60,11 +60,11 @@ export default function SettingsScreen() {
             <HStack spacing={10}>
               <Image
                 systemName="scroll"
-                color="white"
+                color={theme.colors.text}
                 size={20}
                 modifiers={[
                   frame({ width: 40, height: 40 }),
-                  background(`${theme.colors.text}`),
+                  background(`${theme.colors.background}`),
                   clipShape("roundedRectangle"),
                 ]}
               />
