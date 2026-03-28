@@ -43,8 +43,17 @@ export default function ScriptOverlay({
 }: Props) {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
+
+  const isLandscape = width > height;
+  const availableWidth = Math.max(0, width - insets.left - insets.right);
+  const scriptOverlayInitialWidth = isLandscape
+    ? availableWidth / 2
+    : availableWidth;
+
   const overlayHeight = useSharedValue(300);
+  const overlayWidth = useSharedValue(scriptOverlayInitialWidth);
   const startHeight = useSharedValue(300);
+  const startWidth = useSharedValue(scriptOverlayInitialWidth);
   const overlayXCoordinate = useSharedValue(0);
   const overlayYCoordinate = useSharedValue(0);
   const [MMKVScriptIndicatorStyle0] = useMMKVBoolean("scriptIndicatorStyle0");
@@ -57,8 +66,13 @@ export default function ScriptOverlay({
   // reset the overlay position whenever the screen mode is changed.
   useEffect(() => {
     if (width && height) {
+      const isLandscape = width > height;
+
       overlayXCoordinate.value = 0;
       overlayYCoordinate.value = 0;
+
+      overlayHeight.value = 300;
+      overlayWidth.value = isLandscape ? width / 2 : width;
     }
   }, [width, height]);
 
@@ -71,11 +85,17 @@ export default function ScriptOverlay({
   const resizePan = Gesture.Pan()
     .onBegin(() => {
       startHeight.value = overlayHeight.value;
+      startWidth.value = overlayWidth.value;
     })
     .onUpdate((e) => {
       overlayHeight.value = Math.max(
         100,
         Math.min(startHeight.value + e.translationY, 800),
+      );
+
+      overlayWidth.value = Math.min(
+        Math.min(startWidth.value + e.translationX),
+        width - insets.right - 20,
       );
     })
     .onEnd((e) => {
@@ -90,16 +110,16 @@ export default function ScriptOverlay({
   const movePan = Gesture.Pan().onChange((e) => {
     const isLandscape = width > height;
 
-    if (isLandscape) {
-      const leftXPosition = insets.left + 20;
-      const rightXPosition = (width - insets.right) / 1.5;
+    // if (isLandscape) {
+    const leftXPosition = insets.left + 20;
+    const rightXPosition = (width - insets.right) / 1.5;
 
-      if (e.absoluteX < leftXPosition || e.absoluteX > rightXPosition) {
-        return;
-      }
-
-      overlayXCoordinate.value += e.changeX;
+    if (e.absoluteX < leftXPosition || e.absoluteX > rightXPosition) {
+      return;
     }
+
+    overlayXCoordinate.value += e.changeX;
+    // }
 
     const topYPosition = (height - insets.top) * 0.4;
     const bottomYPosition =
@@ -114,6 +134,7 @@ export default function ScriptOverlay({
 
   const overlayStyle = useAnimatedStyle(() => ({
     height: overlayHeight.value,
+    width: overlayWidth.value,
   }));
 
   const overlayContainerStyle = useAnimatedStyle(() => {
@@ -130,12 +151,9 @@ export default function ScriptOverlay({
   });
 
   const overlayBackgroundColor = `rgba(0, 0, 0, ${backgroundOpacity * 0.1})`;
-  const isLandscape = width > height;
-  const availableWidth = Math.max(0, width - insets.left - insets.right);
-  const overlayWidth = isLandscape ? availableWidth / 2 : availableWidth;
-  const overlayPositionStyle = isLandscape
-    ? { left: insets.left, width: overlayWidth }
-    : { left: 0, right: 0 };
+  // const overlayPositionStyle = isLandscape
+  //   ? { left: insets.left, width: overlayWidth }
+  //   : { left: 0, right: 0 };
 
   return (
     <GestureHandlerRootView style={{ flex: 1, width: "100%" }}>
@@ -145,7 +163,8 @@ export default function ScriptOverlay({
           overlayStyle,
           overlayContainerStyle,
           {
-            ...overlayPositionStyle,
+            // ...overlayPositionStyle,
+            left: insets.left,
             top: isLandscape ? 10 : 30,
             height: 300,
             maxHeight: isLandscape ? "95%" : "70%",
