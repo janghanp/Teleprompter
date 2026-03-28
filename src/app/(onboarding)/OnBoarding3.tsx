@@ -4,12 +4,22 @@ import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MMKVStorage } from "..";
+import { useMMKVNumber } from "react-native-mmkv";
 
 export default function OnBoarding3() {
   const router = useRouter();
+  const [_MMKVFontSize, setMMKVFontSize] = useMMKVNumber("fontSize");
+  const [_MMKVLineHeight, setMMKVLineHeight] = useMMKVNumber("lineHeight");
+  const [_MMKVScriptBackgroundOpacity, setMMKVScriptBackgroundOpacity] =
+    useMMKVNumber("scriptBackgroundOpacity");
+  const [_MMKVScrollSpeed, setMMKVScrollSPeed] = useMMKVNumber("scrollSpeed");
 
   async function pressHandler() {
     MMKVStorage.set("onboardingCompleted", true);
+    setMMKVFontSize(5);
+    setMMKVLineHeight(2);
+    setMMKVScriptBackgroundOpacity(5);
+    setMMKVScrollSPeed(16);
     router.replace("/(tabs)/scripts");
   }
 
