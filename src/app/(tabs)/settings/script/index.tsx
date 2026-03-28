@@ -1,21 +1,19 @@
-import { asyncStorage } from "@/app";
 import { TabBarContext } from "@/context/TabBarContext";
 import {
   Button,
   Form,
-  Group,
   Host,
   HStack,
+  Image,
   Section,
   Slider,
   Spacer,
   Text as SwiftText,
   VStack,
-  Image,
 } from "@expo/ui/swift-ui";
 import { useTheme } from "@react-navigation/native";
 import { useFocusEffect } from "expo-router";
-import { use, useEffect, useState } from "react";
+import { use } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -27,15 +25,10 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import {
-  background,
-  buttonStyle,
-  frame,
-  padding,
-  shapes,
-} from "@expo/ui/swift-ui/modifiers";
+import { buttonStyle, frame, padding } from "@expo/ui/swift-ui/modifiers";
 import ScriptIndicator from "@/components/ScriptIndicator";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useMMKVBoolean, useMMKVNumber } from "react-native-mmkv";
 
 export default function SettingsScriptScreen() {
   const theme = useTheme();
@@ -43,12 +36,16 @@ export default function SettingsScriptScreen() {
   const { width, height } = useWindowDimensions();
   const { setIsTabBarHidden } = use(TabBarContext);
 
-  const [fontSizeValue, setFontSizeValue] = useState(2);
-  const [lineHeightValue, setLineHeightValue] = useState(1.4);
-  const [backgroundOpacityValue, setBackgroundOpacityValue] = useState(0.2);
-  const [indicatorValue0, setIndicatorValue0] = useState(false);
-  const [indicatorValue1, setIndicatorValue1] = useState(false);
-  const [indicatorValue2, setIndicatorValue2] = useState(false);
+  const [MMKVFontSize, setMMKVFontSize] = useMMKVNumber("fontSize");
+  const [MMKVLineHeight, setMMKVLineHeight] = useMMKVNumber("lineHeight");
+  const [MMKVScriptBackgroundOpacity, setMMKVScriptBackgroundOpacity] =
+    useMMKVNumber("scriptBackgroundOpacity");
+  const [MMKVScriptIndicatorStyle0, setMMKVScriptIndicatorStyle0] =
+    useMMKVBoolean("scriptIndicatorStyle0");
+  const [MMKVScriptIndicatorStyle1, setMMKVScriptIndicatorStyle1] =
+    useMMKVBoolean("scriptIndicatorStyle1");
+  const [MMKVScriptIndicatorStyle2, setMMKVScriptIndicatorStyle2] =
+    useMMKVBoolean("scriptIndicatorStyle2");
 
   // hide tab bar
   useFocusEffect(() => {
@@ -56,60 +53,9 @@ export default function SettingsScriptScreen() {
     return () => setIsTabBarHidden(false);
   });
 
-  useEffect(() => {
-    // font size
-    (async () => {
-      const fontSizeValueFromAsync = await asyncStorage.getItem("fontSize");
-      const parsed = Number(fontSizeValueFromAsync);
-      setFontSizeValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 2);
-    })();
-
-    // line height
-    (async () => {
-      const lineHeightValueFromAsync = await asyncStorage.getItem("lineHeight");
-      const parsed = Number(lineHeightValueFromAsync);
-      setLineHeightValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 1.4);
-    })();
-
-    // background opacity
-    (async () => {
-      const opacityFromAsync = await asyncStorage.getItem(
-        "scriptBackgroundOpacity",
-      );
-
-      const parsed = Number(opacityFromAsync);
-
-      setBackgroundOpacityValue(parsed);
-    })();
-
-    (async () => {
-      const indicatorValueFromAsync = await asyncStorage.getItem(
-        "scriptIndicatorStyle0",
-      );
-
-      setIndicatorValue0(!!indicatorValueFromAsync);
-    })();
-
-    (async () => {
-      const indicatorValueFromAsync = await asyncStorage.getItem(
-        "scriptIndicatorStyle1",
-      );
-
-      setIndicatorValue1(!!indicatorValueFromAsync);
-    })();
-
-    (async () => {
-      const indicatorValueFromAsync = await asyncStorage.getItem(
-        "scriptIndicatorStyle2",
-      );
-
-      setIndicatorValue2(!!indicatorValueFromAsync);
-    })();
-  }, []);
-
-  const fontSize = 10 + fontSizeValue * 4;
-  const lineHeight = Math.round(fontSize * lineHeightValue);
-  const overlayBackgroundColor = `rgba(0, 0, 0, ${backgroundOpacityValue * 0.1})`;
+  const fontSize = 10 + (MMKVFontSize || 2) * 4;
+  const lineHeight = Math.round(fontSize * (MMKVLineHeight || 0.5));
+  const overlayBackgroundColor = `rgba(0, 0, 0, ${(MMKVScriptBackgroundOpacity || 0.3) * 0.1})`;
   const availableWidth = Math.max(0, width - insets.left - insets.right);
   const isLandscape = width > height;
   const columnGap = 16;
@@ -168,9 +114,9 @@ export default function SettingsScriptScreen() {
           <View style={{ position: "absolute", left: -16, right: -16 }}>
             <ScriptIndicator
               currentScriptOverlayHeight={200}
-              leftArrow={indicatorValue0}
-              line={indicatorValue1}
-              rightArrow={indicatorValue2}
+              leftArrow={MMKVScriptIndicatorStyle0 ?? false}
+              line={MMKVScriptIndicatorStyle1 ?? false}
+              rightArrow={MMKVScriptIndicatorStyle2 ?? false}
             />
           </View>
         </GestureHandlerRootView>
@@ -192,7 +138,7 @@ export default function SettingsScriptScreen() {
                 <Spacer />
                 <Spacer />
                 <Slider
-                  value={fontSizeValue}
+                  value={MMKVFontSize}
                   min={1}
                   max={10}
                   step={0.5}
@@ -200,8 +146,7 @@ export default function SettingsScriptScreen() {
                   minimumValueLabel={<SwiftText>1</SwiftText>}
                   maximumValueLabel={<SwiftText>10</SwiftText>}
                   onValueChange={(value) => {
-                    setFontSizeValue(value);
-                    asyncStorage.setItem("fontSize", value.toString());
+                    setMMKVFontSize(value);
                   }}
                 />
               </VStack>
@@ -212,15 +157,14 @@ export default function SettingsScriptScreen() {
                 <Spacer />
                 <Spacer />
                 <Slider
-                  value={lineHeightValue}
+                  value={MMKVLineHeight}
                   min={1}
                   max={10}
                   step={0.5}
                   minimumValueLabel={<SwiftText>1</SwiftText>}
                   maximumValueLabel={<SwiftText>10</SwiftText>}
                   onValueChange={(value) => {
-                    setLineHeightValue(value);
-                    asyncStorage.setItem("lineHeight", value.toString());
+                    setMMKVLineHeight(value);
                   }}
                 />
               </VStack>
@@ -231,18 +175,14 @@ export default function SettingsScriptScreen() {
                 <Spacer />
                 <Spacer />
                 <Slider
-                  value={backgroundOpacityValue}
+                  value={MMKVScriptBackgroundOpacity}
                   min={1}
                   max={10}
                   step={0.5}
                   minimumValueLabel={<SwiftText>1</SwiftText>}
                   maximumValueLabel={<SwiftText>10</SwiftText>}
                   onValueChange={(value) => {
-                    setBackgroundOpacityValue(value);
-                    asyncStorage.setItem(
-                      "scriptBackgroundOpacity",
-                      value.toString(),
-                    );
+                    setMMKVScriptBackgroundOpacity(value);
                   }}
                 />
               </VStack>
@@ -259,16 +199,12 @@ export default function SettingsScriptScreen() {
                 >
                   <Button
                     onPress={() => {
-                      setIndicatorValue0((prev) => !prev);
-
-                      if (indicatorValue0) {
-                        asyncStorage.removeItem("scriptIndicatorStyle0");
-                      } else {
-                        asyncStorage.setItem("scriptIndicatorStyle0", "true");
-                      }
+                      setMMKVScriptIndicatorStyle0((prev) => !prev);
                     }}
                     modifiers={[
-                      buttonStyle(indicatorValue0 ? "glassProminent" : "glass"),
+                      buttonStyle(
+                        MMKVScriptIndicatorStyle0 ? "glassProminent" : "glass",
+                      ),
                       frame({ maxWidth: 9999 }),
                     ]}
                   >
@@ -288,16 +224,12 @@ export default function SettingsScriptScreen() {
                   </Button>
                   <Button
                     onPress={() => {
-                      setIndicatorValue1((prev) => !prev);
-
-                      if (indicatorValue1) {
-                        asyncStorage.removeItem("scriptIndicatorStyle1");
-                      } else {
-                        asyncStorage.setItem("scriptIndicatorStyle1", "true");
-                      }
+                      setMMKVScriptIndicatorStyle1((prev) => !prev);
                     }}
                     modifiers={[
-                      buttonStyle(indicatorValue1 ? "glassProminent" : "glass"),
+                      buttonStyle(
+                        MMKVScriptIndicatorStyle1 ? "glassProminent" : "glass",
+                      ),
                       frame({ maxWidth: 9999 }),
                     ]}
                   >
@@ -317,16 +249,12 @@ export default function SettingsScriptScreen() {
                   </Button>
                   <Button
                     onPress={() => {
-                      setIndicatorValue2((prev) => !prev);
-
-                      if (indicatorValue2) {
-                        asyncStorage.removeItem("scriptIndicatorStyle2");
-                      } else {
-                        asyncStorage.setItem("scriptIndicatorStyle2", "true");
-                      }
+                      setMMKVScriptIndicatorStyle2((prev) => !prev);
                     }}
                     modifiers={[
-                      buttonStyle(indicatorValue2 ? "glassProminent" : "glass"),
+                      buttonStyle(
+                        MMKVScriptIndicatorStyle2 ? "glassProminent" : "glass",
+                      ),
                       frame({ maxWidth: 9999 }),
                     ]}
                   >

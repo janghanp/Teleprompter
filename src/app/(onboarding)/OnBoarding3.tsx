@@ -3,13 +3,13 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { asyncStorage } from "..";
+import { MMKVStorage } from "..";
 
 export default function OnBoarding3() {
   const router = useRouter();
 
   async function pressHandler() {
-    await asyncStorage.setItem("onboardingCompleted", "true");
+    MMKVStorage.set("onboardingCompleted", true);
     router.replace("/(tabs)/scripts");
   }
 

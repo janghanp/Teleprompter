@@ -1,4 +1,3 @@
-import { asyncStorage } from "@/app";
 import { TabBarContext } from "@/context/TabBarContext";
 import {
   Host,
@@ -8,8 +7,8 @@ import {
   VStack,
 } from "@expo/ui/swift-ui";
 import { useTheme } from "@react-navigation/native";
-import { Stack, useFocusEffect, useRouter } from "expo-router";
-import { use, useEffect, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { use, useEffect, useRef } from "react";
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -23,17 +22,19 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { useMMKVNumber } from "react-native-mmkv";
 
 export default function ScrollSpeedScreen() {
   const theme = useTheme();
-  const router = useRouter();
   const { setIsTabBarHidden } = use(TabBarContext);
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
-  const [fontSizeInitialValue, setFontSizeInitialValue] = useState(0);
-  const [scrollSpeedValue, setScrollSpeedValue] = useState(2);
-  const [lineHeightValue, setLineHeightValue] = useState(1.4);
-  const [backgroundOpacityValue, setBackgroundOpacityValue] = useState(0.2);
+  const [MMKVScrollSpeed, setMMKVScrollSPeed] = useMMKVNumber("scrollSpeed");
+  const [MMKVFontSize] = useMMKVNumber("fontSize");
+  const [MMKVLineHeight] = useMMKVNumber("lineHeight");
+  const [MMKVScriptBackgroundOpacity] = useMMKVNumber(
+    "scriptBackgroundOpacity",
+  );
   const scrollRef = useRef<ScrollView>(null);
   const scrollY = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -44,37 +45,7 @@ export default function ScrollSpeedScreen() {
   });
 
   useEffect(() => {
-    (async () => {
-      const fontSizeValueFromAsync = await asyncStorage.getItem("fontSize");
-      setFontSizeInitialValue(Number(fontSizeValueFromAsync) || 0);
-    })();
-
-    (async () => {
-      const scrollSpeedValueFromAsync =
-        await asyncStorage.getItem("scrollSpeed");
-      const parsed = Number(scrollSpeedValueFromAsync);
-      setScrollSpeedValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 2);
-    })();
-
-    (async () => {
-      const lineHeightValueFromAsync = await asyncStorage.getItem("lineHeight");
-      const parsed = Number(lineHeightValueFromAsync);
-      setLineHeightValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 1.4);
-    })();
-
-    (async () => {
-      const opacityFromAsync = await asyncStorage.getItem(
-        "scriptBackgroundOpacity",
-      );
-
-      const parsed = Number(opacityFromAsync);
-
-      setBackgroundOpacityValue(parsed);
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (!scrollSpeedValue) {
+    if (!MMKVScrollSpeed) {
       return;
     }
 
@@ -83,7 +54,7 @@ export default function ScrollSpeedScreen() {
       clearInterval(intervalRef.current);
     }
 
-    const speedPxPerSec = 6 + scrollSpeedValue * 10;
+    const speedPxPerSec = 6 + MMKVScrollSpeed * 10;
     const intervalMs = 50;
     const step = (speedPxPerSec * intervalMs) / 1000;
 
@@ -97,11 +68,7 @@ export default function ScrollSpeedScreen() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [scrollSpeedValue]);
-
-  useEffect(() => {
-    asyncStorage.setItem("scrollSpeed", scrollSpeedValue.toString());
-  }, [scrollSpeedValue]);
+  }, [MMKVScrollSpeed]);
 
   const handleScriptScroll = (
     event: NativeSyntheticEvent<NativeScrollEvent>,
@@ -109,9 +76,9 @@ export default function ScrollSpeedScreen() {
     scrollY.current = event.nativeEvent.contentOffset.y;
   };
 
-  const fontSize = 10 + Number(fontSizeInitialValue) * 4;
-  const lineHeight = Math.round(fontSize * lineHeightValue);
-  const overlayBackgroundColor = `rgba(0, 0, 0, ${backgroundOpacityValue * 0.1})`;
+  const fontSize = 10 + (MMKVFontSize || 2) * 4;
+  const lineHeight = Math.round(fontSize * (MMKVLineHeight || 0.5));
+  const overlayBackgroundColor = `rgba(0, 0, 0, ${(MMKVScriptBackgroundOpacity || 0.3) * 0.1})`;
   const availableWidth = Math.max(0, width - insets.left - insets.right);
   const isLandscape = width > height;
   const columnGap = 16;
@@ -166,14 +133,16 @@ export default function ScrollSpeedScreen() {
           <Spacer />
           <Spacer />
           <Slider
-            value={scrollSpeedValue}
+            value={MMKVScrollSpeed}
             min={5}
             max={50}
             step={1}
             label={<SwiftText>Speed</SwiftText>}
             minimumValueLabel={<SwiftText>1</SwiftText>}
             maximumValueLabel={<SwiftText>10</SwiftText>}
-            onValueChange={setScrollSpeedValue}
+            onValueChange={(value) => {
+              setMMKVScrollSPeed(value);
+            }}
             modifiers={[]}
           />
         </VStack>

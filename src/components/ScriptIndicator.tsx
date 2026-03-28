@@ -88,7 +88,7 @@ export default function ScriptIndicator({
                 borderTopColor: "transparent",
                 borderBottomColor: "transparent",
                 borderLeftColor: "rgba(255, 255, 255, 0.45)",
-                zIndex: 20,
+                zIndex: 50,
               },
               handleStyle,
             ]}
@@ -110,7 +110,7 @@ export default function ScriptIndicator({
                 height: handleHeight,
                 backgroundColor: "rgba(255, 255, 255, 0.45)",
                 borderRadius: 10,
-                zIndex: 20,
+                zIndex: 50,
               },
               handleStyle,
             ]}
@@ -134,7 +134,7 @@ export default function ScriptIndicator({
                 borderTopColor: "transparent",
                 borderBottomColor: "transparent",
                 borderRightColor: "rgba(255, 255, 255, 0.45)",
-                zIndex: 20,
+                zIndex: 50,
               },
               handleStyle,
             ]}

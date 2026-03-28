@@ -23,12 +23,13 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { asyncStorage } from "..";
 import ScriptOverlay from "@/components/ScriptOverlay";
 import PauseButton from "@/components/PauseButton";
 import RecordButton from "@/components/RecordButton";
 import RecordingTimeBadge from "@/components/RecordingTimeBadge";
 import RecordingSaveButton from "@/components/RecordingSaveButton";
+import PreferenceButton from "@/components/PreferenceButton";
+import { useMMKVNumber } from "react-native-mmkv";
 
 export default function CameraViewScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -50,44 +51,20 @@ export default function CameraViewScreen() {
   );
   const recordingTimeRef = useRef<NodeJS.Timeout | null>(null);
   const [currentRecordingTime, setCurrentRecordingTime] = useState(0);
-  const [fontSizeInitialValue, setFontSizeInitialValue] = useState(0);
-  const [scrollSpeedInitialValue, setScrollSpeedInitialValue] = useState(2);
-  const [lineHeightValue, setLineHeightValue] = useState(1.4);
-  const [scriptBackgroundOpacity, setScriptBackgroundOpacity] = useState(0.5);
+  const [MMKVScrollSpeed] = useMMKVNumber("scrollSpeed");
+  const [MMKVFontSize] = useMMKVNumber("fontSize");
+  const [MMKVLineHeight] = useMMKVNumber("lineHeight");
+  const [MMKVScriptBackgroundOpacity] = useMMKVNumber(
+    "scriptBackgroundOpacity",
+  );
+  const [isSavingPreviewVideo, setIsSavingPreviewVideo] =
+    useState<boolean>(false);
 
   // hide the tab bar
   useFocusEffect(() => {
     setIsTabBarHidden(true);
     return () => setIsTabBarHidden(false);
   });
-
-  // load preference values
-  useEffect(() => {
-    (async () => {
-      const fontSizeValueFromAsync = await asyncStorage.getItem("fontSize");
-      setFontSizeInitialValue(Number(fontSizeValueFromAsync) || 0);
-    })();
-
-    (async () => {
-      const scrollSpeedValueFromAsync =
-        await asyncStorage.getItem("scrollSpeed");
-      setScrollSpeedInitialValue(Number(scrollSpeedValueFromAsync) || 0);
-    })();
-
-    (async () => {
-      const lineHeightValueFromAsync = await asyncStorage.getItem("lineHeight");
-      const parsed = Number(lineHeightValueFromAsync);
-      setLineHeightValue(Number.isFinite(parsed) && parsed > 0 ? parsed : 1.4);
-    })();
-
-    (async () => {
-      const opacityFromAsync = await asyncStorage.getItem(
-        "scriptBackgroundOpacity",
-      );
-      const parsed = Number(opacityFromAsync);
-      setScriptBackgroundOpacity(parsed);
-    })();
-  }, []);
 
   // ask permission to use camera
   useEffect(() => {
@@ -98,7 +75,7 @@ export default function CameraViewScreen() {
 
   // on and off auto-scrolling
   useEffect(() => {
-    const speedPxPerSec = 6 + Number(scrollSpeedInitialValue) * 10;
+    const speedPxPerSec = 6 + Number(MMKVScrollSpeed) * 10;
     const intervalMs = 50;
     const step = (speedPxPerSec * intervalMs) / 1000;
 
@@ -120,7 +97,7 @@ export default function CameraViewScreen() {
         clearInterval(recordingTimeRef.current);
       }
     }
-  }, [isRecording, scrollSpeedInitialValue]);
+  }, [isRecording, MMKVScrollSpeed]);
 
   const recordHandler = async () => {
     scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
@@ -130,10 +107,12 @@ export default function CameraViewScreen() {
 
     if (video?.uri) {
       setCurrentVideoUri(video.uri);
+      setIsSavingPreviewVideo(false);
     }
   };
 
   const pauseHandler = () => {
+    setIsSavingPreviewVideo(true);
     setIsRecording(false);
     cameraRef?.current?.stopRecording();
     setCurrentRecordingTime(0);
@@ -152,6 +131,7 @@ export default function CameraViewScreen() {
         onPress: () => {
           setIsRecording(false);
           setCurrentVideoUri(undefined);
+          setIsSavingPreviewVideo(false);
         },
       },
     ]);
@@ -172,8 +152,8 @@ export default function CameraViewScreen() {
     router.replace("/(tabs)/recordings");
   };
 
-  const fontSize = 10 + Number(fontSizeInitialValue) * 4;
-  const lineHeight = Math.round(fontSize * lineHeightValue);
+  const fontSize = 10 + (MMKVFontSize || 2) * 4;
+  const lineHeight = Math.round(fontSize * (MMKVLineHeight || 0.5));
   const availableWidth = Math.max(0, width - insets.left - insets.right);
   const isLandscape = width > height;
   const rightHalfLeft = insets.left + availableWidth / 2;
@@ -233,7 +213,7 @@ export default function CameraViewScreen() {
           script={script?.[0].content || ""}
           fontSize={fontSize}
           lineHeight={lineHeight}
-          backgroundOpacity={scriptBackgroundOpacity}
+          backgroundOpacity={MMKVScriptBackgroundOpacity || 0.3}
           scrollRef={scrollRef}
           scrollY={scrollY}
         />
@@ -255,6 +235,16 @@ export default function CameraViewScreen() {
       {/* Save button*/}
       <Activity mode={!isRecording && currentVideoUri ? "visible" : "hidden"}>
         <RecordingSaveButton saveHandler={saveHandler} />
+      </Activity>
+      {/* Preferences button*/}
+      <Activity
+        mode={
+          !isRecording && !currentVideoUri && !isSavingPreviewVideo
+            ? "visible"
+            : "hidden"
+        }
+      >
+        <PreferenceButton />
       </Activity>
     </>
   );

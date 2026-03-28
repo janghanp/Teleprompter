@@ -22,7 +22,7 @@ import Animated, {
 import { runOnJS } from "react-native-worklets";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ScriptIndicator from "@/components/ScriptIndicator";
-import { asyncStorage } from "@/app";
+import { useMMKVBoolean } from "react-native-mmkv";
 
 interface Props {
   script: string;
@@ -47,37 +47,12 @@ export default function ScriptOverlay({
   const startHeight = useSharedValue(300);
   const overlayXCoordinate = useSharedValue(0);
   const overlayYCoordinate = useSharedValue(0);
-  const [indicatorValue0, setIndicatorValue0] = useState(false);
-  const [indicatorValue1, setIndicatorValue1] = useState(false);
-  const [indicatorValue2, setIndicatorValue2] = useState(false);
+  const [MMKVScriptIndicatorStyle0] = useMMKVBoolean("scriptIndicatorStyle0");
+  const [MMKVScriptIndicatorStyle1] = useMMKVBoolean("scriptIndicatorStyle1");
+  const [MMKVScriptIndicatorStyle2] = useMMKVBoolean("scriptIndicatorStyle2");
+
   const [currentScriptOverlayHeight, setCurrentScriptOverlayHeight] =
     useState(300);
-
-  useEffect(() => {
-    (async () => {
-      const indicatorValueFromAsync = await asyncStorage.getItem(
-        "scriptIndicatorStyle0",
-      );
-
-      setIndicatorValue0(!!indicatorValueFromAsync);
-    })();
-
-    (async () => {
-      const indicatorValueFromAsync = await asyncStorage.getItem(
-        "scriptIndicatorStyle1",
-      );
-
-      setIndicatorValue1(!!indicatorValueFromAsync);
-    })();
-
-    (async () => {
-      const indicatorValueFromAsync = await asyncStorage.getItem(
-        "scriptIndicatorStyle2",
-      );
-
-      setIndicatorValue2(!!indicatorValueFromAsync);
-    })();
-  }, []);
 
   // reset the overlay position whenever the screen mode is changed.
   useEffect(() => {
@@ -235,9 +210,9 @@ export default function ScriptOverlay({
 
         <ScriptIndicator
           currentScriptOverlayHeight={currentScriptOverlayHeight}
-          leftArrow={indicatorValue0}
-          line={indicatorValue1}
-          rightArrow={indicatorValue2}
+          leftArrow={MMKVScriptIndicatorStyle0 ?? false}
+          line={MMKVScriptIndicatorStyle1 ?? false}
+          rightArrow={MMKVScriptIndicatorStyle2 ?? false}
         />
       </Animated.View>
     </GestureHandlerRootView>
