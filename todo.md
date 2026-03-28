@@ -6,7 +6,7 @@
 
 - [x] preference options on the camera view
 
-- [] gesture weired with indicators
+- [x] gesture weired with indicators
 
 - [] camera view focus (react-native-vision-camera?)
 
