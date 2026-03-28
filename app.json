@@ -18,8 +18,8 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#FFFFFF",
-          "image": "./assets/images/new_app_icon.png",
+          "backgroundColor": "#000000",
+          "image": "./assets/images/splash.png",
           "imageWidth": 200
         }
       ],
@@ -29,7 +29,8 @@
           "assets": [
             "./assets/images/camera.png",
             "./assets/images/teleprompting_2.jpg",
-            "./assets/images/disk.jpg"
+            "./assets/images/disk.jpg",
+            "./assets/images/splash.png"
           ]
         }
       ],

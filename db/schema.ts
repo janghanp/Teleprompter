@@ -13,15 +13,3 @@ export const scriptsTable = sqliteTable("scripts", {
     .default(sql`(unixepoch())`)
     .$onUpdateFn(() => sql`(unixepoch())`),
 });
-
-export const recordingsTable = sqliteTable("recordings", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  fileUri: text("fileUri").notNull(),
-  createdAt: integer("createdAt", { mode: "number" })
-    .notNull()
-    .default(sql`(unixepoch())`),
-  updatedAt: integer("updatedAt", { mode: "number" })
-    .notNull()
-    .default(sql`(unixepoch())`)
-    .$onUpdateFn(() => sql`(unixepoch())`),
-});
