@@ -64,7 +64,7 @@ export default function ScriptDetailScreen() {
     Keyboard.dismiss();
   };
 
-  const goToCameraViewhandler = () => {
+  const goToCameraViewHandler = () => {
     router.push(`/camera_view?id=${id}`);
   };
 
@@ -81,7 +81,7 @@ export default function ScriptDetailScreen() {
         <Stack.Toolbar.Button
           variant="prominent"
           tintColor={"red"}
-          onPress={goToCameraViewhandler}
+          onPress={goToCameraViewHandler}
         >
           • Rec
         </Stack.Toolbar.Button>
