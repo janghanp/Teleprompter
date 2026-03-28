@@ -4,7 +4,7 @@
     "slug": "Teleprompter",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/images/app_icon_glass_effect.png",
+    "icon": "./assets/images/new_app_icon.png",
     "scheme": "teleprompter",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -19,7 +19,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#FFFFFF",
-          "image": "./assets/images/app_icon_glass_effect.png",
+          "image": "./assets/images/new_app_icon.png",
           "imageWidth": 200
         }
       ],
@@ -28,7 +28,7 @@
         {
           "assets": [
             "./assets/images/camera.png",
-            "./assets/images/teleprompting.png",
+            "./assets/images/teleprompting_2.jpg",
             "./assets/images/disk.jpg"
           ]
         }

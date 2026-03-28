@@ -15,7 +15,7 @@ export default function OnBoarding2() {
     <SafeAreaView style={styles.screen}>
       <View style={styles.heroCard}>
         <Image
-          source={require("@/assets/images/teleprompting.png")}
+          source={require("@/assets/images/teleprompting_2.jpg")}
           style={styles.heroImage}
           contentFit="cover"
         />
