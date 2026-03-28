@@ -18,31 +18,25 @@ import {
   TextInput,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function ScriptDetailScreen() {
   const theme = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { script, isScriptLoading, scriptError } = useGetScriptById(Number(id));
-  const { updateScript, isUpdateScriptPending } = useUpdateScript();
+  const { script } = useGetScriptById(Number(id));
+  const { updateScript } = useUpdateScript();
   const { setIsTabBarHidden } = use(TabBarContext);
   const router = useRouter();
   const [text, setText] = useState("");
+  const debounced = useDebouncedCallback(() => {
+    saveHandler(true);
+  }, 1000);
 
   useEffect(() => {
     if (script && script.length > 0) {
       const scriptContent = script[0].content || "";
+
       setText(scriptContent);
-
-      // auto save after 1 second with changes.
-      setTimeout(() => {
-        const updatedScript: UpdateScriptInput = {
-          id: script[0].id,
-          title: script[0].title,
-          content: scriptContent,
-        };
-
-        updateScript(updatedScript);
-      }, 1000);
     }
   }, [script]);
 
@@ -51,7 +45,7 @@ export default function ScriptDetailScreen() {
     return () => setIsTabBarHidden(false);
   });
 
-  const saveHandler = () => {
+  const saveHandler = (skipKeyboardDismiss?: boolean) => {
     if (!script || script.length === 0) return;
 
     const updatedScript: UpdateScriptInput = {
@@ -61,11 +55,20 @@ export default function ScriptDetailScreen() {
     };
 
     updateScript(updatedScript);
-    Keyboard.dismiss();
+
+    if (!skipKeyboardDismiss) {
+      Keyboard.dismiss();
+    }
   };
 
   const goToCameraViewHandler = () => {
+    saveHandler();
     router.push(`/camera_view?id=${id}`);
+  };
+
+  const goBackHandler = () => {
+    saveHandler();
+    router.back();
   };
 
   return (
@@ -74,7 +77,7 @@ export default function ScriptDetailScreen() {
         <Stack.Toolbar.Button
           icon={"chevron.left"}
           variant="plain"
-          onPress={() => router.back()}
+          onPress={goBackHandler}
         />
       </Stack.Toolbar>
       <Stack.Toolbar placement="right">
@@ -102,7 +105,10 @@ export default function ScriptDetailScreen() {
             multiline={true}
             placeholder="Start typing here..."
             value={text}
-            onChangeText={setText}
+            onChangeText={(value) => {
+              setText(value);
+              debounced();
+            }}
             textAlignVertical="top"
           />
         </KeyboardAvoidingView>
