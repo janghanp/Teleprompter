@@ -30,7 +30,19 @@ export default function ScriptDetailScreen() {
 
   useEffect(() => {
     if (script && script.length > 0) {
-      setText(script[0].content || "");
+      const scriptContent = script[0].content || "";
+      setText(scriptContent);
+
+      // auto save after 1 second with changes.
+      setTimeout(() => {
+        const updatedScript: UpdateScriptInput = {
+          id: script[0].id,
+          title: script[0].title,
+          content: scriptContent,
+        };
+
+        updateScript(updatedScript);
+      }, 1000);
     }
   }, [script]);
 
