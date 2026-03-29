@@ -29,6 +29,15 @@ export default function SettingsLayout() {
           headerBackButtonDisplayMode: "minimal",
         }}
       />
+      <Stack.Screen
+        name="voice-recognition"
+        options={{
+          headerLargeTitleEnabled: true,
+          headerTitle: "",
+          headerTransparent: true,
+          headerBackButtonDisplayMode: "minimal",
+        }}
+      />
     </Stack>
   );
 }

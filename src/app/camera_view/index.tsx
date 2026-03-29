@@ -30,6 +30,10 @@ import RecordingTimeBadge from "@/components/RecordingTimeBadge";
 import RecordingSaveButton from "@/components/RecordingSaveButton";
 import PreferenceButton from "@/components/PreferenceButton";
 import { useMMKVNumber } from "react-native-mmkv";
+import {
+  useSpeechRecognitionEvent,
+  ExpoSpeechRecognitionModule,
+} from "expo-speech-recognition";
 
 export default function CameraViewScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -59,6 +63,50 @@ export default function CameraViewScreen() {
   );
   const [isSavingPreviewVideo, setIsSavingPreviewVideo] =
     useState<boolean>(false);
+
+  // -----------------------------voice recognition setup------------------------------------
+  // const [recognizing, setRecognizing] = useState(false);
+  // const [transcript, setTranscript] = useState("");
+  //
+  // useSpeechRecognitionEvent("start", () => {
+  //   console.log("start");
+  //   setRecognizing(true);
+  // });
+  // useSpeechRecognitionEvent("end", () => {
+  //   console.log("end");
+  //   setRecognizing(false);
+  // });
+  // useSpeechRecognitionEvent("result", (event) => {
+  //   console.log(event.results[0]?.transcript);
+  //   setTranscript(event.results[0]?.transcript);
+  // });
+  // useSpeechRecognitionEvent("error", (event) => {
+  //   console.log("error code:", event.error, "error message:", event.message);
+  // });
+  // useSpeechRecognitionEvent("volumechange", (event) => {
+  //   // a value between -2 and 10. <= 0 is inaudible
+  //   console.log("Volume changed to:", event.value);
+  // });
+  //
+  // const handleStart = async () => {
+  //   const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+  //   if (!result.granted) {
+  //     console.warn("Permissions not granted", result);
+  //     return;
+  //   }
+  //   // Start speech recognition
+  //   ExpoSpeechRecognitionModule.start({
+  //     lang: "en-AU",
+  //     // lang: "ko-KR",
+  //     interimResults: true,
+  //     continuous: true,
+  //     volumeChangeEventOptions: {
+  //       enabled: true,
+  //       intervalMillis: 300,
+  //     },
+  //   });
+  // };
+  // -----------------------------voice recognition setup------------------------------------
 
   // hide the tab bar
   useFocusEffect(() => {
@@ -236,7 +284,7 @@ export default function CameraViewScreen() {
       <Activity mode={!isRecording && currentVideoUri ? "visible" : "hidden"}>
         <RecordingSaveButton saveHandler={saveHandler} />
       </Activity>
-      {/* Preferences button*/}
+      {/* Preference button*/}
       <Activity
         mode={
           !isRecording && !currentVideoUri && !isSavingPreviewVideo
