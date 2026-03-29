@@ -6,9 +6,8 @@ export default function ScriptDetailLayout() {
       <Stack.Screen
         name="index"
         options={{
-          headerLargeTitleEnabled: true,
           headerTitle: "",
-          headerTransparent: true,
+          headerShadowVisible: false,
         }}
       />
     </Stack>
