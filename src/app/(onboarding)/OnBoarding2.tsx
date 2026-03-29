@@ -1,7 +1,7 @@
 import CtaButton from "@/components/CtaButton";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OnBoarding2() {
@@ -13,28 +13,33 @@ export default function OnBoarding2() {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={styles.heroCard}>
-        <Image
-          source={require("@/assets/images/teleprompting_2.jpg")}
-          style={styles.heroImage}
-          contentFit="cover"
-        />
-      </View>
-      <View>
-        <View style={styles.content}>
-          <Text style={styles.title}>Record with Confidence</Text>
-          <Text style={styles.subtitle}>
-            Read your script while recording{"\n"}and tailor speed and font
-            size.
-          </Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.heroCard}>
+          <Image
+            source={require("@/assets/images/teleprompting_2.jpg")}
+            style={styles.heroImage}
+            contentFit="cover"
+          />
         </View>
-        <View style={styles.dots}>
-          <View style={styles.dot} />
-          <View style={[styles.dot, styles.dotActive]} />
-          <View style={styles.dot} />
+        <View>
+          <View style={styles.content}>
+            <Text style={styles.title}>Record with Confidence</Text>
+            <Text style={styles.subtitle}>
+              Read your script while recording{"\n"}and tailor speed and font
+              size.
+            </Text>
+          </View>
+          <View style={styles.dots}>
+            <View style={styles.dot} />
+            <View style={[styles.dot, styles.dotActive]} />
+            <View style={styles.dot} />
+          </View>
         </View>
-      </View>
-      <CtaButton title="Continue" pressHandler={pressHandler} />
+        <CtaButton title="Continue" pressHandler={pressHandler} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -45,7 +50,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2F3F5",
     paddingHorizontal: 24,
     paddingTop: 12,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "space-between",
+    paddingBottom: 24,
   },
   heroCard: {
     marginTop: 44,

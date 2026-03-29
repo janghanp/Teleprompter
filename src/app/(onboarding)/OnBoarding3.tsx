@@ -1,10 +1,10 @@
 import CtaButton from "@/components/CtaButton";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useMMKVNumber } from "react-native-mmkv";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MMKVStorage } from "..";
-import { useMMKVNumber } from "react-native-mmkv";
 
 export default function OnBoarding3() {
   const router = useRouter();
@@ -25,28 +25,33 @@ export default function OnBoarding3() {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View style={styles.heroCard}>
-        <Image
-          source={require("@/assets/images/disk.jpg")}
-          style={styles.heroImage}
-          contentFit="cover"
-        />
-      </View>
-      <View>
-        <View style={styles.content}>
-          <Text style={styles.title}>Save &amp; Share</Text>
-          <Text style={styles.subtitle}>
-            Save your videos in high quality{"\n"}and share anywhere with one
-            tap.
-          </Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.heroCard}>
+          <Image
+            source={require("@/assets/images/disk.jpg")}
+            style={styles.heroImage}
+            contentFit="cover"
+          />
         </View>
-        <View style={styles.dots}>
-          <View style={styles.dot} />
-          <View style={styles.dot} />
-          <View style={[styles.dot, styles.dotActive]} />
+        <View>
+          <View style={styles.content}>
+            <Text style={styles.title}>Save &amp; Share</Text>
+            <Text style={styles.subtitle}>
+              Save your videos in high quality{"\n"}and share anywhere with one
+              tap.
+            </Text>
+          </View>
+          <View style={styles.dots}>
+            <View style={styles.dot} />
+            <View style={styles.dot} />
+            <View style={[styles.dot, styles.dotActive]} />
+          </View>
         </View>
-      </View>
-      <CtaButton title="Get Started" pressHandler={pressHandler} />
+        <CtaButton title="Get Started" pressHandler={pressHandler} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -57,7 +62,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2F3F5",
     paddingHorizontal: 24,
     paddingTop: 12,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "space-between",
+    paddingBottom: 24,
   },
   heroCard: {
     marginTop: 44,
