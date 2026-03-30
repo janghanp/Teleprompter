@@ -17,10 +17,13 @@ import {
   frame,
 } from "@expo/ui/swift-ui/modifiers";
 import { useTheme } from "@react-navigation/native";
+import { useMMKVBoolean } from "react-native-mmkv";
 
 export default function SettingsScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const [MMKVVoiceRecognition, setMMKVVoiceRecognition] =
+    useMMKVBoolean("voiceRecognition");
 
   return (
     <Host style={{ flex: 1 }}>
@@ -107,6 +110,9 @@ export default function SettingsScreen() {
               <Image systemName="chevron.right" size={18} color="secondary" />
             </HStack>
           </Button>
+        </Section>
+        <Section>
+          <Toggle isOn={MMKVVoiceRecognition} label={"Dark Mode"} />
         </Section>
       </Form>
     </Host>

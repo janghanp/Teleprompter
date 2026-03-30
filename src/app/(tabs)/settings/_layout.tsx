@@ -32,10 +32,9 @@ export default function SettingsLayout() {
       <Stack.Screen
         name="voice-recognition"
         options={{
-          headerLargeTitleEnabled: true,
-          headerTitle: "",
-          headerTransparent: true,
+          title: "Voice Recognition",
           headerBackButtonDisplayMode: "minimal",
+          headerTransparent: true,
         }}
       />
     </Stack>
