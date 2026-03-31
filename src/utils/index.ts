@@ -42,3 +42,5 @@ export const formatModified = (modified: number | null) => {
   });
   return `${datePart} ${timePart}`;
 };
+
+export const languageOptions = ["en-AU", "ko-KR"];
