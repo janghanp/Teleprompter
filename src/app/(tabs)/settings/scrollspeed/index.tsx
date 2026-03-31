@@ -115,15 +115,32 @@ export default function ScrollSpeedScreen() {
           onScroll={handleScriptScroll}
         >
           <Text style={[styles.scriptText, { fontSize, lineHeight }]}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of Lorem Ipsum.
+            Hello everyone, and thanks for joining me today. I want to share a
+            quick idea about clear communication and why preparation matters.
+            Whether you’re recording a video, presenting to a team, or speaking
+            at an event, the most important thing is connecting with your
+            audience. A short plan helps. Start with a simple message, use
+            examples people recognize, and keep your pace steady. If you pause
+            at key moments, people have time to absorb what you’re saying.
+            Today’s message is simple: clarity builds trust. When your ideas are
+            easy to follow, people listen. When you sound confident, people
+            believe you. So the next time you press record or step in front of a
+            group, take a minute to prepare. Know your opening, know your
+            closing, and let the middle flow naturally. Thanks for your time.
+            Let’s keep making communication easier, one message at a time.
+            Hello everyone, and thanks for joining me today. I want to share a
+            quick idea about clear communication and why preparation matters.
+            Whether you’re recording a video, presenting to a team, or speaking
+            at an event, the most important thing is connecting with your
+            audience. A short plan helps. Start with a simple message, use
+            examples people recognize, and keep your pace steady. If you pause
+            at key moments, people have time to absorb what you’re saying.
+            Today’s message is simple: clarity builds trust. When your ideas are
+            easy to follow, people listen. When you sound confident, people
+            believe you. So the next time you press record or step in front of a
+            group, take a minute to prepare. Know your opening, know your
+            closing, and let the middle flow naturally. Thanks for your time.
+            Let’s keep making communication easier, one message at a time.
           </Text>
         </ScrollView>
       </View>
