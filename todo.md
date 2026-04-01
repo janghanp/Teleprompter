@@ -1,5 +1,12 @@
+- [] voice recognition with recording
+  -> how to compare the speech text and the script
+
+
 - [] script screen with inset left and right
+    -> landscape mode
 
-- [] voice recognition option on the settings screen
+- [] when resizing the script overlay it shrinks right away
 
-- [] voice recognition
+- [] search feature for scripts and recordings
+
+- [] scripts and recordings order by createdAt

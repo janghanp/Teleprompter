@@ -151,9 +151,6 @@ export default function ScriptOverlay({
   });
 
   const overlayBackgroundColor = `rgba(0, 0, 0, ${backgroundOpacity * 0.1})`;
-  // const overlayPositionStyle = isLandscape
-  //   ? { left: insets.left, width: overlayWidth }
-  //   : { left: 0, right: 0 };
 
   return (
     <GestureHandlerRootView style={{ flex: 1, width: "100%" }}>
