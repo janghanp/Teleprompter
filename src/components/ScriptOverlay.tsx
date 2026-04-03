@@ -103,7 +103,7 @@ export default function ScriptOverlay({
 
       overlayWidth.value = Math.min(
         Math.min(startWidth.value + e.translationX),
-        width - insets.right - 20,
+        isLandscape ? width - insets.left - insets.right : width,
       );
     })
     .onEnd((e) => {
@@ -118,7 +118,6 @@ export default function ScriptOverlay({
   const movePan = Gesture.Pan().onChange((e) => {
     const isLandscape = width > height;
 
-    // if (isLandscape) {
     const leftXPosition = insets.left + 20;
     const rightXPosition = (width - insets.right) / 1.5;
 
@@ -127,7 +126,6 @@ export default function ScriptOverlay({
     }
 
     overlayXCoordinate.value += e.changeX;
-    // }
 
     const topYPosition = (height - insets.top) * 0.4;
     const bottomYPosition =
