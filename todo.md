@@ -5,7 +5,7 @@
 
 - [x] scripts and recordings order by createdAt
 
-- [] search feature for scripts and recordings
+- [x] search feature for scripts and recordings
 
 - [] voice recognition with recording
   -> how to compare the speech text and the script
