@@ -7,5 +7,7 @@
 
 - [x] search feature for scripts and recordings
 
+- [] ask permission when turing the voice recognition on from the settings screen
+
 - [] voice recognition with recording
-  -> how to compare the speech text and the script
+    -> how to compare the speech text and the script

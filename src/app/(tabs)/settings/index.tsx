@@ -80,7 +80,7 @@ export default function SettingsScreen() {
               <Image systemName="chevron.right" size={18} color="secondary" />
             </HStack>
           </Button>
-          <Button
+          {/* <Button
             onPress={() => {
               router.push("/settings/voice-recognition");
             }}
@@ -106,7 +106,7 @@ export default function SettingsScreen() {
               <Spacer />
               <Image systemName="chevron.right" size={18} color="secondary" />
             </HStack>
-          </Button>
+          </Button> */}
         </Section>
       </Form>
     </Host>
