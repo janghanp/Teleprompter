@@ -40,6 +40,7 @@ import {
   ExpoSpeechRecognitionModule,
 } from "expo-speech-recognition";
 import { useTheme } from "@react-navigation/native";
+import VolumeMeter from "@/components/VolumeMeter";
 
 export default function CameraViewScreen() {
   const themes = useTheme();
@@ -77,29 +78,30 @@ export default function CameraViewScreen() {
   const [transcript, setTranscript] = useState("");
   const totalScrollHeightRef = useRef(0);
   const scriptWordIndexRef = useRef(0);
-  useSpeechRecognitionEvent("start", () => {
-    console.log("voice recognition, start");
-    setIsVoiceRecognizing(true);
-  });
-  useSpeechRecognitionEvent("end", () => {
-    console.log("voice recognition end");
-    setIsVoiceRecognizing(false);
-  });
-  useSpeechRecognitionEvent("result", (event) => {
-    const text = event.results[0]?.transcript ?? "";
-    setTranscript(text);
 
-    if (MMKVVoiceRecognition && isRecording) {
-      scrollToTranscriptPosition(text);
-    }
-  });
-  useSpeechRecognitionEvent("error", (event) => {
-    console.log("error code:", event.error, "error message:", event.message);
-  });
-  useSpeechRecognitionEvent("volumechange", (event) => {
-    // a value between -2 and 10. <= 0 is inaudible
-    // console.log("Volume changed to:", event.value);
-  });
+  // useSpeechRecognitionEvent("start", () => {
+  //   console.log("voice recognition, start");
+  //   setIsVoiceRecognizing(true);
+  // });
+  // useSpeechRecognitionEvent("end", () => {
+  //   console.log("voice recognition end");
+  //   setIsVoiceRecognizing(false);
+  // });
+  // useSpeechRecognitionEvent("result", (event) => {
+  //   const text = event.results[0]?.transcript ?? "";
+  //   setTranscript(text);
+  //
+  //   if (MMKVVoiceRecognition && isRecording) {
+  //     scrollToTranscriptPosition(text);
+  //   }
+  // });
+  // useSpeechRecognitionEvent("error", (event) => {
+  //   console.log("error code:", event.error, "error message:", event.message);
+  // });
+  // useSpeechRecognitionEvent("volumechange", (event) => {
+  //   // a value between -2 and 10. <= 0 is inaudible
+  //   // console.log("Volume changed to:", event.value);
+  // });
 
   // hide the tab bar
   useFocusEffect(() => {
@@ -121,14 +123,10 @@ export default function CameraViewScreen() {
     const step = (speedPxPerSec * intervalMs) / 1000;
 
     if (isRecording) {
-      if (MMKVVoiceRecognition) {
-        void handleVoiceRecognitionStart();
-      } else {
-        intervalRef.current = setInterval(() => {
-          scrollY.current += step;
-          scrollRef.current?.scrollTo({ y: scrollY.current, animated: true });
-        }, intervalMs);
-      }
+      intervalRef.current = setInterval(() => {
+        scrollY.current += step;
+        scrollRef.current?.scrollTo({ y: scrollY.current, animated: true });
+      }, intervalMs);
 
       recordingTimeRef.current = setInterval(() => {
         setCurrentRecordingTime((prev) => prev + 1);
@@ -145,54 +143,55 @@ export default function CameraViewScreen() {
   }, [isRecording, MMKVScrollSpeed, MMKVVoiceRecognition]);
 
   //TODO: make sure the current position is always in the middle of the script overley height
-  const scrollToTranscriptPosition = (transcriptText: string) => {
-    if (!script?.[0]?.content || totalScrollHeightRef.current === 0) return;
 
-    const normalize = (s: string) =>
-      s
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, "")
-        .trim();
+  // const scrollToTranscriptPosition = (transcriptText: string) => {
+  //   if (!script?.[0]?.content || totalScrollHeightRef.current === 0) return;
+  //
+  //   const normalize = (s: string) =>
+  //     s
+  //       .toLowerCase()
+  //       .replace(/[^a-z0-9\s]/g, "")
+  //       .trim();
+  //
+  //   const scriptWords = normalize(script[0].content).split(/\s+/);
+  //   const spokenWords = normalize(transcriptText).split(/\s+/);
+  //
+  //   // Use the last few spoken words as a search window
+  //   const window = spokenWords.slice(-6);
+  //   const searchFrom = Math.max(0, scriptWordIndexRef.current - 3);
+  //
+  //   for (let i = searchFrom; i <= scriptWords.length - window.length; i++) {
+  //     const isMatch = window.every((w, j) => scriptWords[i + j]?.startsWith(w));
+  //     if (isMatch) {
+  //       scriptWordIndexRef.current = i + window.length;
+  //       const progress = scriptWordIndexRef.current / scriptWords.length;
+  //       const targetY = progress * totalScrollHeightRef.current;
+  //       scrollY.current = targetY;
+  //       scrollRef.current?.scrollTo({ y: targetY, animated: true });
+  //       break;
+  //     }
+  //   }
+  // };
 
-    const scriptWords = normalize(script[0].content).split(/\s+/);
-    const spokenWords = normalize(transcriptText).split(/\s+/);
-
-    // Use the last few spoken words as a search window
-    const window = spokenWords.slice(-6);
-    const searchFrom = Math.max(0, scriptWordIndexRef.current - 3);
-
-    for (let i = searchFrom; i <= scriptWords.length - window.length; i++) {
-      const isMatch = window.every((w, j) => scriptWords[i + j]?.startsWith(w));
-      if (isMatch) {
-        scriptWordIndexRef.current = i + window.length;
-        const progress = scriptWordIndexRef.current / scriptWords.length;
-        const targetY = progress * totalScrollHeightRef.current;
-        scrollY.current = targetY;
-        scrollRef.current?.scrollTo({ y: targetY, animated: true });
-        break;
-      }
-    }
-  };
-
-  const handleVoiceRecognitionStart = async () => {
-    const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-
-    if (!result.granted) {
-      console.warn("Permissions not granted", result);
-      return;
-    }
-
-    // Start speech recognition
-    ExpoSpeechRecognitionModule.start({
-      lang: MMKVLanguage || "en-AU",
-      interimResults: true,
-      continuous: true,
-      volumeChangeEventOptions: {
-        enabled: true,
-        intervalMillis: 300,
-      },
-    });
-  };
+  // const handleVoiceRecognitionStart = async () => {
+  //   const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+  //
+  //   if (!result.granted) {
+  //     console.warn("Permissions not granted", result);
+  //     return;
+  //   }
+  //
+  //   // Start speech recognition
+  //   ExpoSpeechRecognitionModule.start({
+  //     lang: MMKVLanguage || "en-AU",
+  //     interimResults: true,
+  //     continuous: true,
+  //     volumeChangeEventOptions: {
+  //       enabled: true,
+  //       intervalMillis: 300,
+  //     },
+  //   });
+  // };
 
   const recordHandler = async () => {
     scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
@@ -207,13 +206,13 @@ export default function CameraViewScreen() {
   };
 
   const pauseHandler = () => {
-    if (MMKVVoiceRecognition && isVoiceRecognizing) {
-      ExpoSpeechRecognitionModule.stop();
-    }
+    // if (MMKVVoiceRecognition && isVoiceRecognizing) {
+    //   ExpoSpeechRecognitionModule.stop();
+    // }
 
+    cameraRef?.current?.stopRecording();
     setIsSavingPreviewVideo(true);
     setIsRecording(false);
-    cameraRef?.current?.stopRecording();
     setCurrentRecordingTime(0);
   };
 
@@ -320,8 +319,17 @@ export default function CameraViewScreen() {
         />
         {currentVideoUri && <RecordingPreview tempVideoUri={currentVideoUri} />}
       </View>
-      <View style={[styles.playPauseWrapper, playPausePositionStyle]}>
-        <Activity mode={isSavingPreviewVideo ? "hidden" : "visible"}>
+      <VolumeMeter isRecording={isRecording} />
+      <View
+        style={[
+          styles.playPauseWrapper,
+          playPausePositionStyle,
+          { bottom: insets.bottom },
+        ]}
+      >
+        <Activity
+          mode={isSavingPreviewVideo || currentVideoUri ? "hidden" : "visible"}
+        >
           <Activity mode={!isRecording ? "visible" : "hidden"}>
             <RecordButton pressHandler={recordHandler} />
           </Activity>
@@ -364,7 +372,6 @@ const styles = StyleSheet.create({
   camera: StyleSheet.absoluteFillObject,
   playPauseWrapper: {
     position: "absolute",
-    bottom: 20,
     left: 0,
     right: 0,
     alignItems: "center",

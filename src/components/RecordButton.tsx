@@ -6,7 +6,10 @@ interface Props {
 
 export default function RecordButton({ pressHandler }: Props) {
   return (
-    <Pressable style={[styles.playPauseButton]} onPress={pressHandler}>
+    <Pressable
+      style={[styles.playPauseButton, { bottom: 0 }]}
+      onPress={pressHandler}
+    >
       <View
         style={{
           width: 50,
@@ -22,7 +25,7 @@ export default function RecordButton({ pressHandler }: Props) {
 const styles = StyleSheet.create({
   playPauseButton: {
     position: "absolute",
-    top: -64,
+    bottom: 0,
     zIndex: 100,
     width: 64,
     height: 64,

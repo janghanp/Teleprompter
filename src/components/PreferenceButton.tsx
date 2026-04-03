@@ -26,8 +26,10 @@ import {
 } from "@expo/ui/swift-ui/modifiers";
 import { useState } from "react";
 import { useMMKVBoolean, useMMKVNumber } from "react-native-mmkv";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PreferenceButton() {
+  const insets = useSafeAreaInsets();
   const [isPresented, setIsPresented] = useState(false);
   const [MMKVFontSize, setMMKVFontSize] = useMMKVNumber("fontSize");
   const [MMKVLineHeight, setMMKVLineHeight] = useMMKVNumber("lineHeight");
@@ -46,7 +48,7 @@ export default function PreferenceButton() {
   };
 
   return (
-    <Host style={styles.container}>
+    <Host style={[styles.container, { bottom: insets.bottom }]}>
       <Button
         label={"Preference"}
         systemImage={"gear"}
@@ -252,8 +254,7 @@ export default function PreferenceButton() {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    right: 20,
-    bottom: 20,
+    right: 25,
     width: 50,
     height: 50,
     zIndex: 100,

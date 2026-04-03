@@ -57,7 +57,12 @@ export default function RecordingPreview({ tempVideoUri }: Props) {
   const leftMargin = insets.left + (isLandscape ? 0 : 16);
 
   return (
-    <View style={[styles.tempVideoWrapper, { left: leftMargin }]}>
+    <View
+      style={[
+        styles.tempVideoWrapper,
+        { left: leftMargin, bottom: insets.bottom },
+      ]}
+    >
       <View style={styles.container}>
         {thumbnail ? (
           <Pressable onPress={pressHandler}>
@@ -83,7 +88,6 @@ const styles = StyleSheet.create({
   tempVideoWrapper: {
     position: "absolute",
     left: 16,
-    bottom: 16,
     zIndex: 100,
   },
   container: {

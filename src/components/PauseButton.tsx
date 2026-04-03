@@ -16,7 +16,7 @@ export default function PauseButton({ pressHandler }: Props) {
 const styles = StyleSheet.create({
   playPauseButton: {
     position: "absolute",
-    top: -64,
+    bottom: 0,
     zIndex: 100,
     width: 64,
     height: 64,

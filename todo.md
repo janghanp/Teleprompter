@@ -1,8 +1,10 @@
 - [x] show loading spinner when processing recording video when paused
 
-- [] volume level UI on the camera screen
+- [x] volume level UI on the camera screen
 
 - [] resolution option
+
+- [] auto-scroll test in the script screen
 
 - [] cinematic mode
   - camera focus mode
