@@ -9,12 +9,18 @@ export default function ScriptsLayout() {
           headerLargeTitleEnabled: true,
           headerTitle: "Scripts",
           headerTransparent: true,
+          headerShadowVisible: false,
+          headerBackVisible: false,
         }}
       />
       <Stack.Screen
-        name="[id]"
+        name="[id]/index"
         options={{
-          headerShown: false,
+          headerTitle: "",
+          headerBackButtonDisplayMode: "minimal",
+          headerTransparent: true,
+          headerShadowVisible: false,
+          headerBackVisible: false,
         }}
       />
     </Stack>

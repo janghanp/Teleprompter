@@ -4,6 +4,7 @@ import { useGetAllScripts } from "@/hooks/useGetAllScripts";
 import { CreateScriptInput, Script } from "@/utils/interfaces";
 import { useTheme } from "@react-navigation/native";
 import { Stack } from "expo-router";
+import { useState } from "react";
 import {
   Alert,
   FlatList,
@@ -30,6 +31,7 @@ export default function ScriptsScreen() {
     isScriptsRefreshing,
     refetchScripts,
   } = useGetAllScripts();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const isLandscape = width > height;
   const gridColumns = isLandscape ? LANDSCAPE_COLUMNS : PORTRAIT_COLUMNS;
@@ -85,7 +87,10 @@ export default function ScriptsScreen() {
     );
   };
 
-  const scriptItems = (scripts ?? []) as Script[];
+  const filteredScripts = scripts?.filter((script) =>
+    script.title?.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+  const scriptItems = (filteredScripts ?? []) as Script[];
   const statusMessage = isScriptsLoading
     ? "Loading scripts..."
     : scriptsError
@@ -103,6 +108,12 @@ export default function ScriptsScreen() {
           onPress={pressHandler}
         />
       </Stack.Toolbar>
+      <Stack.SearchBar
+        hideWhenScrolling={false}
+        onChangeText={(e) => {
+          setSearchQuery(e.nativeEvent.text);
+        }}
+      />
       <FlatList
         contentInsetAdjustmentBehavior="automatic"
         data={scriptItems}

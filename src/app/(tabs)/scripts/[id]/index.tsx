@@ -17,10 +17,9 @@ import {
   StyleSheet,
   TextInput,
   useWindowDimensions,
-  View,
 } from "react-native";
 import { useDebouncedCallback } from "use-debounce";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ScriptDetailScreen() {
   const theme = useTheme();
@@ -98,7 +97,7 @@ export default function ScriptDetailScreen() {
           Save
         </Stack.Toolbar.Button>
       </Stack.Toolbar>
-      <View style={[styles.container, { backgroundColor: theme.colors.card }]}>
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.card }]}>
         <KeyboardAvoidingView
           style={[
             styles.container,
@@ -124,7 +123,7 @@ export default function ScriptDetailScreen() {
             textAlignVertical="top"
           />
         </KeyboardAvoidingView>
-      </View>
+      </SafeAreaView>
     </>
   );
 }
@@ -136,6 +135,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    paddingTop: 20
   },
   editor: {
     flex: 1,
