@@ -16,17 +16,21 @@ import {
   Platform,
   StyleSheet,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { useDebouncedCallback } from "use-debounce";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ScriptDetailScreen() {
   const theme = useTheme();
+  const { width } = useWindowDimensions();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { script } = useGetScriptById(Number(id));
   const { updateScript } = useUpdateScript();
   const { setIsTabBarHidden } = use(TabBarContext);
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [text, setText] = useState("");
   const debounced = useDebouncedCallback(() => {
     saveHandler(true);
@@ -71,6 +75,8 @@ export default function ScriptDetailScreen() {
     router.back();
   };
 
+  const availableWidth = width - insets.left - insets.right;
+
   return (
     <>
       <Stack.Toolbar placement="left">
@@ -104,7 +110,10 @@ export default function ScriptDetailScreen() {
           keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
         >
           <TextInput
-            style={[styles.editor, { color: theme.colors.text }]}
+            style={[
+              styles.editor,
+              { color: theme.colors.text, width: availableWidth },
+            ]}
             multiline={true}
             placeholder="Start typing here..."
             value={text}
@@ -124,6 +133,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   editor: {
     flex: 1,

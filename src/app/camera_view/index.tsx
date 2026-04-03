@@ -72,6 +72,8 @@ export default function CameraViewScreen() {
     useState<boolean>(false);
   const [isVoiceRecognizing, setIsVoiceRecognizing] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const totalScrollHeightRef = useRef(0);
+  const scriptWordIndexRef = useRef(0);
   useSpeechRecognitionEvent("start", () => {
     console.log("voice recognition, start");
     setIsVoiceRecognizing(true);
@@ -81,8 +83,12 @@ export default function CameraViewScreen() {
     setIsVoiceRecognizing(false);
   });
   useSpeechRecognitionEvent("result", (event) => {
-    console.log(event.results[0]?.transcript);
-    setTranscript(event.results[0]?.transcript);
+    const text = event.results[0]?.transcript ?? "";
+    setTranscript(text);
+
+    if (MMKVVoiceRecognition && isRecording) {
+      scrollToTranscriptPosition(text);
+    }
   });
   useSpeechRecognitionEvent("error", (event) => {
     console.log("error code:", event.error, "error message:", event.message);
@@ -91,8 +97,6 @@ export default function CameraViewScreen() {
     // a value between -2 and 10. <= 0 is inaudible
     // console.log("Volume changed to:", event.value);
   });
-
-  console.log(transcript);
 
   // hide the tab bar
   useFocusEffect(() => {
@@ -136,6 +140,36 @@ export default function CameraViewScreen() {
       }
     }
   }, [isRecording, MMKVScrollSpeed, MMKVVoiceRecognition]);
+
+  //TODO: make sure the current position is always in the middle of the script overley height
+  const scrollToTranscriptPosition = (transcriptText: string) => {
+    if (!script?.[0]?.content || totalScrollHeightRef.current === 0) return;
+
+    const normalize = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, "")
+        .trim();
+
+    const scriptWords = normalize(script[0].content).split(/\s+/);
+    const spokenWords = normalize(transcriptText).split(/\s+/);
+
+    // Use the last few spoken words as a search window
+    const window = spokenWords.slice(-6);
+    const searchFrom = Math.max(0, scriptWordIndexRef.current - 3);
+
+    for (let i = searchFrom; i <= scriptWords.length - window.length; i++) {
+      const isMatch = window.every((w, j) => scriptWords[i + j]?.startsWith(w));
+      if (isMatch) {
+        scriptWordIndexRef.current = i + window.length;
+        const progress = scriptWordIndexRef.current / scriptWords.length;
+        const targetY = progress * totalScrollHeightRef.current;
+        scrollY.current = targetY;
+        scrollRef.current?.scrollTo({ y: targetY, animated: true });
+        break;
+      }
+    }
+  };
 
   const handleVoiceRecognitionStart = async () => {
     const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
@@ -278,6 +312,7 @@ export default function CameraViewScreen() {
           backgroundOpacity={MMKVScriptBackgroundOpacity || 0.3}
           scrollRef={scrollRef}
           scrollY={scrollY}
+          totalScrollHeightRef={totalScrollHeightRef}
         />
         {currentVideoUri && <RecordingPreview tempVideoUri={currentVideoUri} />}
       </View>

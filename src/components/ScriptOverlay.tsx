@@ -31,6 +31,7 @@ interface Props {
   backgroundOpacity: number;
   scrollRef: RefObject<ScrollView | null>;
   scrollY: RefObject<number>;
+  totalScrollHeightRef: RefObject<number>;
 }
 
 export default function ScriptOverlay({
@@ -40,6 +41,7 @@ export default function ScriptOverlay({
   backgroundOpacity,
   scrollRef,
   scrollY,
+  totalScrollHeightRef,
 }: Props) {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
@@ -62,6 +64,12 @@ export default function ScriptOverlay({
 
   const [currentScriptOverlayHeight, setCurrentScriptOverlayHeight] =
     useState(300);
+
+  useEffect(() => {
+    if (currentScriptOverlayHeight) {
+      totalScrollHeightRef.current = currentScriptOverlayHeight;
+    }
+  }, [currentScriptOverlayHeight]);
 
   // reset the overlay position whenever the screen mode is changed.
   useEffect(() => {
