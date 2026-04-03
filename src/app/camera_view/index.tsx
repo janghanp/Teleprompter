@@ -16,6 +16,7 @@ import {
 } from "expo-router";
 import { Activity, use, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -38,8 +39,10 @@ import {
   useSpeechRecognitionEvent,
   ExpoSpeechRecognitionModule,
 } from "expo-speech-recognition";
+import { useTheme } from "@react-navigation/native";
 
 export default function CameraViewScreen() {
+  const themes = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { setIsTabBarHidden } = use(TabBarContext);
   const router = useRouter();
@@ -300,6 +303,7 @@ export default function CameraViewScreen() {
             facing={facing}
             mute={false}
             mirror={facing === "front"}
+            videoStabilizationMode={"cinematic"}
             videoQuality={"2160p"}
             focusable
             responsiveOrientationWhenOrientationLocked
@@ -316,24 +320,25 @@ export default function CameraViewScreen() {
         />
         {currentVideoUri && <RecordingPreview tempVideoUri={currentVideoUri} />}
       </View>
-      {/* record and pause buttons*/}
       <View style={[styles.playPauseWrapper, playPausePositionStyle]}>
-        <Activity mode={!isRecording ? "visible" : "hidden"}>
-          <RecordButton pressHandler={recordHandler} />
+        <Activity mode={isSavingPreviewVideo ? "hidden" : "visible"}>
+          <Activity mode={!isRecording ? "visible" : "hidden"}>
+            <RecordButton pressHandler={recordHandler} />
+          </Activity>
+          <Activity mode={isRecording ? "visible" : "hidden"}>
+            <PauseButton pressHandler={pauseHandler} />
+          </Activity>
         </Activity>
-        <Activity mode={isRecording ? "visible" : "hidden"}>
-          <PauseButton pressHandler={pauseHandler} />
+        <Activity mode={isSavingPreviewVideo ? "visible" : "hidden"}>
+          <ActivityIndicator size={"large"} color={themes.colors.text} />
         </Activity>
       </View>
-      {/* Recording time */}
       <Activity mode={isRecording ? "visible" : "hidden"}>
         <RecordingTimeBadge currentRecordingTime={currentRecordingTime} />
       </Activity>
-      {/* Save button*/}
       <Activity mode={!isRecording && currentVideoUri ? "visible" : "hidden"}>
         <RecordingSaveButton saveHandler={saveHandler} />
       </Activity>
-      {/* Preference button*/}
       <Activity
         mode={
           !isRecording && !currentVideoUri && !isSavingPreviewVideo

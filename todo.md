@@ -1,13 +1,11 @@
-- [x] script screen with inset left and right
-    -> landscape mode
+- [x] show loading spinner when processing recording video when paused
 
-- [x] when resizing the script overlay, it shrinks right away
+- [] volume level UI on the camera screen
 
-- [x] scripts and recordings order by createdAt
+- [] resolution option
 
-- [x] search feature for scripts and recordings
+- [] cinematic mode
+  - camera focus mode
 
-- [] ask permission when turing the voice recognition on from the settings screen
-
-- [] voice recognition with recording
-    -> how to compare the speech text and the script
+- [] voice recognition
+  - ask permission when turning the voice recognition on from the settings screen

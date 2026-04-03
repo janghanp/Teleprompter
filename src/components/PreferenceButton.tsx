@@ -252,8 +252,8 @@ export default function PreferenceButton() {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    right: 30,
-    bottom: 40,
+    right: 20,
+    bottom: 20,
     width: 50,
     height: 50,
     zIndex: 100,
