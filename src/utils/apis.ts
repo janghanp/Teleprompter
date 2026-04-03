@@ -1,5 +1,5 @@
 import { db } from "@/app";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { scriptsTable } from "../../db/schema";
 import { CreateScriptInput, UpdateScriptInput } from "./interfaces";
 
@@ -13,7 +13,10 @@ export async function insertScript(scriptInput: CreateScriptInput) {
 }
 
 export async function getAllScripts() {
-  const scripts = await db.select().from(scriptsTable);
+  const scripts = await db
+    .select()
+    .from(scriptsTable)
+    .orderBy(desc(scriptsTable.createdAt));
 
   return scripts;
 }
