@@ -48,14 +48,18 @@ export default function VolumeMeter({ isRecording }: Props) {
 
   useEffect(() => {
     if (isRecording) {
-      void recorder.record();
+      void recorder?.record();
     } else {
-      void recorder.pause();
+      void recorder?.pause();
       fillPercent.value = withSpring(0, SPRING_CONFIG);
     }
   }, [isRecording]);
 
   useEffect(() => {
+    if (!state) {
+      return;
+    }
+
     if (state.isRecording) {
       const raw = (state.metering ?? -160) + 160; // shift -160~0 → 0~160
       const normalized = Math.min(raw / 160, 1); // clamp to 0~1

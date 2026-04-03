@@ -19,7 +19,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useDebouncedCallback } from "use-debounce";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ScriptDetailScreen() {
   const theme = useTheme();
@@ -31,6 +31,8 @@ export default function ScriptDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [text, setText] = useState("");
+  const [isEditable, setIsEditable] = useState(true);
+
   const debounced = useDebouncedCallback(() => {
     saveHandler(true);
   }, 1000);
@@ -74,6 +76,9 @@ export default function ScriptDetailScreen() {
     router.back();
   };
 
+  const disableEditing = () => setIsEditable(false);
+  const enableEditing = () => setIsEditable(true);
+
   const availableWidth = width - insets.left - insets.right;
 
   return (
@@ -97,33 +102,36 @@ export default function ScriptDetailScreen() {
           Save
         </Stack.Toolbar.Button>
       </Stack.Toolbar>
-      <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.card }]}>
-        <KeyboardAvoidingView
+
+      <KeyboardAvoidingView
+        style={[
+          styles.container,
+          {
+            backgroundColor: theme.colors.card,
+          },
+        ]}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        // keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      >
+        <TextInput
           style={[
-            styles.container,
-            {
-              backgroundColor: theme.colors.card,
-            },
+            styles.editor,
+            { color: theme.colors.text, width: availableWidth },
           ]}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
-        >
-          <TextInput
-            style={[
-              styles.editor,
-              { color: theme.colors.text, width: availableWidth },
-            ]}
-            multiline={true}
-            placeholder="Start typing here..."
-            value={text}
-            onChangeText={(value) => {
-              setText(value);
-              debounced();
-            }}
-            textAlignVertical="top"
-          />
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+          onTouchMove={disableEditing}
+          onTouchEnd={enableEditing}
+          onTouchCancel={enableEditing}
+          editable={isEditable}
+          multiline={true}
+          placeholder="Start typing here..."
+          value={text}
+          onChangeText={(value) => {
+            setText(value);
+            debounced();
+          }}
+          textAlignVertical="top"
+        />
+      </KeyboardAvoidingView>
     </>
   );
 }
@@ -135,11 +143,11 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 20
   },
   editor: {
     flex: 1,
     padding: 20,
+    paddingBottom: 300,
     fontSize: 18,
     lineHeight: 24,
     textAlignVertical: "top",
