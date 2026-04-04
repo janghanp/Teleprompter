@@ -30,6 +30,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PreferenceButton() {
   const insets = useSafeAreaInsets();
+
   const [isPresented, setIsPresented] = useState(false);
   const [MMKVFontSize, setMMKVFontSize] = useMMKVNumber("fontSize");
   const [MMKVLineHeight, setMMKVLineHeight] = useMMKVNumber("lineHeight");

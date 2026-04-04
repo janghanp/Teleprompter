@@ -2,9 +2,9 @@
 
 - [x] volume level UI on the camera screen
 
-- [] resolution option
+- [x] auto-scroll test in the script screen
 
-- [] auto-scroll test in the script screen
+- [] resolution option
 
 - [] cinematic mode
   - camera focus mode
