@@ -292,8 +292,7 @@ export default function CameraViewScreen() {
             isActive={true}
             video={true}
             audio={true}
-            enablePortraitEffectsMatteDelivery={true}
-            enableDepthData={true}
+            enableLocation={false}
           />
         </View>
         <ScriptOverlay
