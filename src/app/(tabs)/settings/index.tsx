@@ -7,7 +7,6 @@ import {
   Section,
   Spacer,
   Text,
-  Toggle,
 } from "@expo/ui/swift-ui";
 import { useRouter } from "expo-router";
 import {
@@ -80,14 +79,14 @@ export default function SettingsScreen() {
               <Image systemName="chevron.right" size={18} color="secondary" />
             </HStack>
           </Button>
-          {/* <Button
+          <Button
             onPress={() => {
-              router.push("/settings/voice-recognition");
+              router.push("/settings/camera");
             }}
           >
             <HStack spacing={10}>
               <Image
-                systemName="mic.and.signal.meter"
+                systemName="camera"
                 color={theme.colors.text}
                 size={20}
                 modifiers={[
@@ -101,12 +100,39 @@ export default function SettingsScreen() {
                   foregroundStyle({ type: "color", color: theme.colors.text }),
                 ]}
               >
-                Voice Recognition
+                Camera
               </Text>
               <Spacer />
               <Image systemName="chevron.right" size={18} color="secondary" />
             </HStack>
-          </Button> */}
+          </Button>
+          {/*<Button*/}
+          {/*  onPress={() => {*/}
+          {/*    router.push("/settings/voice-recognition");*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  <HStack spacing={10}>*/}
+          {/*    <Image*/}
+          {/*      systemName="mic.and.signal.meter"*/}
+          {/*      color={theme.colors.text}*/}
+          {/*      size={20}*/}
+          {/*      modifiers={[*/}
+          {/*        frame({ width: 40, height: 40 }),*/}
+          {/*        background(`${theme.colors.background}`),*/}
+          {/*        clipShape("roundedRectangle"),*/}
+          {/*      ]}*/}
+          {/*    />*/}
+          {/*    <Text*/}
+          {/*      modifiers={[*/}
+          {/*        foregroundStyle({ type: "color", color: theme.colors.text }),*/}
+          {/*      ]}*/}
+          {/*    >*/}
+          {/*      Voice Recognition*/}
+          {/*    </Text>*/}
+          {/*    <Spacer />*/}
+          {/*    <Image systemName="chevron.right" size={18} color="secondary" />*/}
+          {/*  </HStack>*/}
+          {/*</Button>*/}
         </Section>
       </Form>
     </Host>

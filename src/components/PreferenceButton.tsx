@@ -7,9 +7,11 @@ import {
   Host,
   HStack,
   Image,
+  Picker,
   Section,
   Slider,
   Spacer,
+  Text,
   Text as SwiftText,
   VStack,
 } from "@expo/ui/swift-ui";
@@ -20,13 +22,25 @@ import {
   frame,
   labelStyle,
   padding,
+  pickerStyle,
   presentationDetents,
   presentationDragIndicator,
+  tag,
   tint,
 } from "@expo/ui/swift-ui/modifiers";
 import { useState } from "react";
-import { useMMKVBoolean, useMMKVNumber } from "react-native-mmkv";
+import {
+  useMMKVBoolean,
+  useMMKVNumber,
+  useMMKVString,
+} from "react-native-mmkv";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  frameRateOptions,
+  resolutionOptions,
+  stabilizationOptions,
+} from "@/utils";
+import { upperFirst } from "lodash";
 
 export default function PreferenceButton() {
   const insets = useSafeAreaInsets();
@@ -43,6 +57,10 @@ export default function PreferenceButton() {
   const [MMKVScriptIndicatorStyle2, setMMKVScriptIndicatorStyle2] =
     useMMKVBoolean("scriptIndicatorStyle2");
   const [MMKVScrollSpeed, setMMKVScrollSPeed] = useMMKVNumber("scrollSpeed");
+  const [MMKVResolution, setMMKVResolution] = useMMKVString("resolution");
+  const [MMKVFrameRate, setMMKVFrameRate] = useMMKVNumber("frameRate");
+  const [MMKVStabilization, setMMKVStabilization] =
+    useMMKVString("stabilization");
 
   const pressHandler = () => {
     setIsPresented(true);
@@ -74,7 +92,7 @@ export default function PreferenceButton() {
           ]}
         >
           <Form>
-            <Section title={"Preference"}>
+            <Section title={"Script"}>
               <Section title={""}>
                 <VStack alignment={"leading"}>
                   <SwiftText>Font Size</SwiftText>
@@ -244,6 +262,50 @@ export default function PreferenceButton() {
                   />
                 </VStack>
               </Section>
+            </Section>
+            <Section title={"Camera"}>
+              <Picker
+                label={"Resolution"}
+                modifiers={[pickerStyle("menu")]}
+                selection={MMKVResolution || "HD"}
+                onSelectionChange={(selection) => {
+                  setMMKVResolution(selection);
+                }}
+              >
+                {resolutionOptions.map((option) => (
+                  <Text key={option} modifiers={[tag(option)]}>
+                    {option}
+                  </Text>
+                ))}
+              </Picker>
+              <Picker
+                label={"Frame Rate"}
+                modifiers={[pickerStyle("menu")]}
+                selection={MMKVFrameRate || 60}
+                onSelectionChange={(selection) => {
+                  setMMKVFrameRate(selection);
+                }}
+              >
+                {frameRateOptions.map((option) => (
+                  <Text key={option} modifiers={[tag(option)]}>
+                    {option} fps
+                  </Text>
+                ))}
+              </Picker>
+              <Picker
+                label={"Stabilization"}
+                modifiers={[pickerStyle("menu")]}
+                selection={MMKVStabilization || "auto"}
+                onSelectionChange={(selection) => {
+                  setMMKVStabilization(selection);
+                }}
+              >
+                {stabilizationOptions.map((option) => (
+                  <Text key={option} modifiers={[tag(option)]}>
+                    {upperFirst(option)}
+                  </Text>
+                ))}
+              </Picker>
             </Section>
           </Form>
         </Group>

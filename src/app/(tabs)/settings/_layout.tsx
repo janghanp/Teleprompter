@@ -37,6 +37,14 @@ export default function SettingsLayout() {
           headerTransparent: true,
         }}
       />
+      <Stack.Screen
+        name="camera"
+        options={{
+          title: "Camera",
+          headerBackButtonDisplayMode: "minimal",
+          headerTransparent: true,
+        }}
+      />
     </Stack>
   );
 }

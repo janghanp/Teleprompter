@@ -1,3 +1,5 @@
+import { VideoStabilizationMode } from "react-native-vision-camera";
+
 export const formatBytes = (bytes: number | null) => {
   if (bytes === null) {
     return "Unknown size";
@@ -44,3 +46,15 @@ export const formatModified = (modified: number | null) => {
 };
 
 export const languageOptions = ["en-AU", "ko-KR"];
+
+export const resolutionOptions = ["HD", "4K"];
+
+export const frameRateOptions = [24, 30, 60];
+
+export const stabilizationOptions: VideoStabilizationMode[] = [
+  "off",
+  "auto",
+  "standard",
+  "cinematic",
+  "cinematic-extended",
+];

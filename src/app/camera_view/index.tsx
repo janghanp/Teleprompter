@@ -1,12 +1,6 @@
 import RecordingPreview from "@/components/RecordingPreview";
 import { TabBarContext } from "@/context/TabBarContext";
 import { useGetScriptById } from "@/hooks/useGetScriptById";
-import {
-  CameraMode,
-  CameraType,
-  CameraView,
-  useCameraPermissions,
-} from "expo-camera";
 import { File, Paths } from "expo-file-system";
 import {
   Stack,
@@ -30,17 +24,17 @@ import RecordButton from "@/components/RecordButton";
 import RecordingTimeBadge from "@/components/RecordingTimeBadge";
 import RecordingSaveButton from "@/components/RecordingSaveButton";
 import PreferenceButton from "@/components/PreferenceButton";
-import {
-  useMMKVBoolean,
-  useMMKVNumber,
-  useMMKVString,
-} from "react-native-mmkv";
-import {
-  useSpeechRecognitionEvent,
-  ExpoSpeechRecognitionModule,
-} from "expo-speech-recognition";
+import { useMMKVNumber, useMMKVString } from "react-native-mmkv";
 import { useTheme } from "@react-navigation/native";
 import VolumeMeter from "@/components/VolumeMeter";
+import {
+  Camera,
+  useCameraDevice,
+  useCameraFormat,
+  useCameraPermission,
+  useMicrophonePermission,
+  VideoStabilizationMode,
+} from "react-native-vision-camera";
 
 export default function CameraViewScreen() {
   const themes = useTheme();
@@ -49,11 +43,19 @@ export default function CameraViewScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
-  const [permission, requestPermission] = useCameraPermissions();
   const { script } = useGetScriptById(Number(id));
-  const cameraRef = useRef<CameraView>(null);
-  const [mode] = useState<CameraMode>("video");
-  const [facing, setFacing] = useState<CameraType>("front");
+  const [cameraPosition, setCameraPosition] = useState<"front" | "back">(
+    "front",
+  );
+  const cameraRef = useRef<Camera>(null);
+  const {
+    hasPermission: hasCameraPermission,
+    requestPermission: requestCameraPermission,
+  } = useCameraPermission();
+  const {
+    hasPermission: hasMicrophonePermission,
+    requestPermission: requestMicrophonePermission,
+  } = useMicrophonePermission();
   const scrollRef = useRef<ScrollView>(null);
   const scrollY = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -61,6 +63,12 @@ export default function CameraViewScreen() {
   const [currentVideoUri, setCurrentVideoUri] = useState<string | undefined>(
     undefined,
   );
+  const [isSavingPreviewVideo, setIsSavingPreviewVideo] =
+    useState<boolean>(false);
+  const [isVoiceRecognizing, setIsVoiceRecognizing] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const totalScrollHeightRef = useRef(0);
+  const scriptWordIndexRef = useRef(0);
   const recordingTimeRef = useRef<NodeJS.Timeout | null>(null);
   const [currentRecordingTime, setCurrentRecordingTime] = useState(0);
   const [MMKVScrollSpeed] = useMMKVNumber("scrollSpeed");
@@ -69,15 +77,28 @@ export default function CameraViewScreen() {
   const [MMKVScriptBackgroundOpacity] = useMMKVNumber(
     "scriptBackgroundOpacity",
   );
-  const [MMKVVoiceRecognition, _setMMKVVoiceRecognition] =
-    useMMKVBoolean("voiceRecognition");
-  const [MMKVLanguage, _setMMKVLanguage] = useMMKVString("language");
-  const [isSavingPreviewVideo, setIsSavingPreviewVideo] =
-    useState<boolean>(false);
-  const [isVoiceRecognizing, setIsVoiceRecognizing] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const totalScrollHeightRef = useRef(0);
-  const scriptWordIndexRef = useRef(0);
+  const [MMKVResolution, setMMKVResolution] = useMMKVString("resolution");
+  const [MMKVFrameRate, setMMKVFrameRate] = useMMKVNumber("frameRate");
+  const [MMKVStabilization, setMMKVStabilization] =
+    useMMKVString("stabilization");
+  const cameraDevice = useCameraDevice(cameraPosition);
+  const cameraFormat = useCameraFormat(cameraDevice, [
+    { fps: MMKVFrameRate },
+    {
+      videoResolution:
+        MMKVResolution == "4K"
+          ? { width: 3840, height: 2160 }
+          : { width: 1920, height: 1080 },
+    },
+    {
+      videoStabilizationMode:
+        (MMKVStabilization as VideoStabilizationMode) || "auto",
+    },
+  ]);
+
+  // const [MMKVVoiceRecognition, _setMMKVVoiceRecognition] =
+  //   useMMKVBoolean("voiceRecognition");
+  // const [MMKVLanguage, _setMMKVLanguage] = useMMKVString("language");
 
   // useSpeechRecognitionEvent("start", () => {
   //   console.log("voice recognition, start");
@@ -109,12 +130,16 @@ export default function CameraViewScreen() {
     return () => setIsTabBarHidden(false);
   });
 
-  // ask permission to use camera
+  // ask permissions
   useEffect(() => {
-    if (!permission || !permission.granted) {
-      void requestPermission();
+    if (!hasCameraPermission) {
+      requestCameraPermission();
     }
-  }, [permission]);
+
+    if (!hasMicrophonePermission) {
+      requestMicrophonePermission();
+    }
+  }, [hasCameraPermission, hasMicrophonePermission]);
 
   // on and off auto-scrolling
   useEffect(() => {
@@ -140,84 +165,52 @@ export default function CameraViewScreen() {
         clearInterval(recordingTimeRef.current);
       }
     }
-  }, [isRecording, MMKVScrollSpeed, MMKVVoiceRecognition]);
-
-  //TODO: make sure the current position is always in the middle of the script overley height
-
-  // const scrollToTranscriptPosition = (transcriptText: string) => {
-  //   if (!script?.[0]?.content || totalScrollHeightRef.current === 0) return;
-  //
-  //   const normalize = (s: string) =>
-  //     s
-  //       .toLowerCase()
-  //       .replace(/[^a-z0-9\s]/g, "")
-  //       .trim();
-  //
-  //   const scriptWords = normalize(script[0].content).split(/\s+/);
-  //   const spokenWords = normalize(transcriptText).split(/\s+/);
-  //
-  //   // Use the last few spoken words as a search window
-  //   const window = spokenWords.slice(-6);
-  //   const searchFrom = Math.max(0, scriptWordIndexRef.current - 3);
-  //
-  //   for (let i = searchFrom; i <= scriptWords.length - window.length; i++) {
-  //     const isMatch = window.every((w, j) => scriptWords[i + j]?.startsWith(w));
-  //     if (isMatch) {
-  //       scriptWordIndexRef.current = i + window.length;
-  //       const progress = scriptWordIndexRef.current / scriptWords.length;
-  //       const targetY = progress * totalScrollHeightRef.current;
-  //       scrollY.current = targetY;
-  //       scrollRef.current?.scrollTo({ y: targetY, animated: true });
-  //       break;
-  //     }
-  //   }
-  // };
-
-  // const handleVoiceRecognitionStart = async () => {
-  //   const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-  //
-  //   if (!result.granted) {
-  //     console.warn("Permissions not granted", result);
-  //     return;
-  //   }
-  //
-  //   // Start speech recognition
-  //   ExpoSpeechRecognitionModule.start({
-  //     lang: MMKVLanguage || "en-AU",
-  //     interimResults: true,
-  //     continuous: true,
-  //     volumeChangeEventOptions: {
-  //       enabled: true,
-  //       intervalMillis: 300,
-  //     },
-  //   });
-  // };
+  }, [isRecording, MMKVScrollSpeed]);
 
   const recordHandler = async () => {
     scrollRef.current?.scrollTo({ y: scrollY.current, animated: false });
 
     setIsRecording(true);
-    const video = await cameraRef?.current?.recordAsync();
 
-    if (video?.uri) {
-      setCurrentVideoUri(video.uri);
-      setIsSavingPreviewVideo(false);
+    if (!cameraRef.current) {
+      return;
     }
+
+    cameraRef.current.startRecording({
+      onRecordingFinished: (video) => {
+        setCurrentVideoUri(video.path);
+        setIsSavingPreviewVideo(false);
+      },
+      onRecordingError: (error) => {
+        console.log(error);
+        Alert.alert("Error", "Something went wrong while recording the video");
+      },
+    });
   };
 
   const pauseHandler = () => {
-    // if (MMKVVoiceRecognition && isVoiceRecognizing) {
-    //   ExpoSpeechRecognitionModule.stop();
-    // }
+    if (!cameraRef.current) {
+      return;
+    }
 
-    cameraRef?.current?.stopRecording();
+    void cameraRef.current.stopRecording();
     setIsSavingPreviewVideo(true);
     setIsRecording(false);
     setCurrentRecordingTime(0);
   };
 
   const toggleFacing = () => {
-    setFacing((prev) => (prev === "back" ? "front" : "back"));
+    setCameraPosition((prev) => {
+      if (prev === "back") {
+        return "front";
+      }
+
+      if (prev === "front") {
+        return "back";
+      }
+
+      return "front";
+    });
   };
 
   const cancelHandler = () => {
@@ -259,12 +252,7 @@ export default function CameraViewScreen() {
     ? { left: rightHalfLeft, right: insets.right }
     : { left: 0, right: 0 };
 
-  // Camera permissions are still loading.
-  if (!permission) {
-    return <View />;
-  }
-
-  if (!permission.granted) {
+  if (!hasCameraPermission || !hasMicrophonePermission) {
     return <View />;
   }
 
@@ -294,18 +282,18 @@ export default function CameraViewScreen() {
         </Stack.Toolbar.Button>
       </Stack.Toolbar>
       <View style={styles.container}>
-        <View style={styles.cameraContainer}>
-          <CameraView
-            style={styles.camera}
+        <View style={StyleSheet.absoluteFill}>
+          <Camera
             ref={cameraRef}
-            mode={mode}
-            facing={facing}
-            mute={false}
-            mirror={facing === "front"}
-            videoStabilizationMode={"cinematic"}
-            videoQuality={"2160p"}
-            focusable
-            responsiveOrientationWhenOrientationLocked
+            format={cameraFormat}
+            device={cameraDevice!}
+            style={StyleSheet.absoluteFill}
+            fps={cameraFormat?.maxFps}
+            isActive={true}
+            video={true}
+            audio={true}
+            enablePortraitEffectsMatteDelivery={true}
+            enableDepthData={true}
           />
         </View>
         <ScriptOverlay
@@ -368,8 +356,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  cameraContainer: StyleSheet.absoluteFillObject,
-  camera: StyleSheet.absoluteFillObject,
   playPauseWrapper: {
     position: "absolute",
     left: 0,

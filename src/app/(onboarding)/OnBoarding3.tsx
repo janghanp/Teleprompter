@@ -2,7 +2,7 @@ import CtaButton from "@/components/CtaButton";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { useMMKVNumber } from "react-native-mmkv";
+import { useMMKVNumber, useMMKVString } from "react-native-mmkv";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MMKVStorage } from "..";
 
@@ -13,6 +13,10 @@ export default function OnBoarding3() {
   const [_MMKVScriptBackgroundOpacity, setMMKVScriptBackgroundOpacity] =
     useMMKVNumber("scriptBackgroundOpacity");
   const [_MMKVScrollSpeed, setMMKVScrollSPeed] = useMMKVNumber("scrollSpeed");
+  const [_MMKVResolution, setMMKVResolution] = useMMKVString("resolution");
+  const [_MMKVFrameRate, setMMKVFrameRate] = useMMKVNumber("frameRate");
+  const [_MMKVStabilization, setMMKVStabilization] =
+    useMMKVString("stabilization");
 
   async function pressHandler() {
     MMKVStorage.set("onboardingCompleted", true);
@@ -20,6 +24,9 @@ export default function OnBoarding3() {
     setMMKVLineHeight(2);
     setMMKVScriptBackgroundOpacity(5);
     setMMKVScrollSPeed(16);
+    setMMKVResolution("HD");
+    setMMKVFrameRate(60);
+    setMMKVStabilization("auto");
     router.replace("/(tabs)/scripts");
   }
 

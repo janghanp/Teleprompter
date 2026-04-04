@@ -313,7 +313,7 @@ export default function ScriptDetailScreen() {
             ]}
           >
             <Form>
-              <Section title={"Preference"}>
+              <Section title={"Script"}>
                 <Section title={""}>
                   <VStack alignment={"leading"}>
                     <SwiftText>Font Size</SwiftText>
