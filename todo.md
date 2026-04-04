@@ -4,6 +4,8 @@
 
 - [x] auto-scroll test in the script screen
 
+- [] show the current mic input source
+
 - [] resolution option
 
 - [] cinematic mode

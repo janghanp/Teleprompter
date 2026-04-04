@@ -20,7 +20,10 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useDebouncedCallback } from "use-debounce";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { StackToolbar } from "expo-router/build/layouts/stack-utils";
 import ScriptOverlay from "@/components/ScriptOverlay";
 import { useMMKVBoolean, useMMKVNumber } from "react-native-mmkv";
@@ -77,6 +80,7 @@ export default function ScriptDetailScreen() {
   const scrollY = useRef(0);
   const totalScrollHeightRef = useRef(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   const debounced = useDebouncedCallback(() => {
     saveHandler(true);
@@ -86,6 +90,20 @@ export default function ScriptDetailScreen() {
     setIsTabBarHidden(true);
     return () => setIsTabBarHidden(false);
   });
+
+  useEffect(() => {
+    const show = Keyboard.addListener("keyboardDidShow", () =>
+      setIsKeyboardVisible(true),
+    );
+    const hide = Keyboard.addListener("keyboardDidHide", () =>
+      setIsKeyboardVisible(false),
+    );
+
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (script && script.length > 0) {
@@ -253,24 +271,32 @@ export default function ScriptDetailScreen() {
             ]}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
-            <TextInput
-              style={[
-                styles.editor,
-                { color: theme.colors.text, width: availableWidth },
-              ]}
-              onTouchMove={disableEditing}
-              onTouchEnd={enableEditing}
-              onTouchCancel={enableEditing}
-              editable={isEditable}
-              multiline={true}
-              placeholder="Start typing here..."
-              value={text}
-              onChangeText={(value) => {
-                setText(value);
-                debounced();
-              }}
-              textAlignVertical="top"
-            />
+            <ScrollView>
+              <TextInput
+                style={[
+                  styles.editor,
+                  {
+                    color: theme.colors.text,
+                    width: availableWidth,
+                    paddingTop: 100,
+                    paddingBottom: 250,
+                  },
+                ]}
+                scrollEnabled={false}
+                onTouchMove={disableEditing}
+                onTouchEnd={enableEditing}
+                onTouchCancel={enableEditing}
+                editable={isEditable}
+                multiline={true}
+                placeholder="Start typing here..."
+                value={text}
+                onChangeText={(value) => {
+                  setText(value);
+                  debounced();
+                }}
+                textAlignVertical="top"
+              />
+            </ScrollView>
           </KeyboardAvoidingView>
         </Animated.View>
       )}
@@ -471,13 +497,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     alignItems: "center",
   },
   editor: {
-    flex: 1,
     padding: 20,
-    paddingBottom: 300,
     fontSize: 18,
     lineHeight: 24,
     textAlignVertical: "top",
