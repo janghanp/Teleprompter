@@ -50,8 +50,10 @@ export default function VolumeMeter({ isRecording }: Props) {
     if (isRecording) {
       void recorder?.record();
     } else {
-      void recorder?.pause();
-      fillPercent.value = withSpring(0, SPRING_CONFIG);
+      if (recorder.isRecording) {
+        void recorder?.pause();
+        fillPercent.value = withSpring(0, SPRING_CONFIG);
+      }
     }
   }, [isRecording]);
 
