@@ -1,15 +1,15 @@
 import {
-  useAudioRecorder,
-  RecordingPresets,
-  useAudioRecorderState,
   AudioModule,
+  RecordingPresets,
   setAudioModeAsync,
+  useAudioRecorder,
+  useAudioRecorderState,
 } from "expo-audio";
 import { useEffect } from "react";
 import { Alert, StyleSheet, useWindowDimensions, View } from "react-native";
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
+  useSharedValue,
   withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -27,47 +27,56 @@ interface Props {
 export default function VolumeMeter({ isRecording }: Props) {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
-  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
-  const state = useAudioRecorderState(recorder);
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const recorderState = useAudioRecorderState(audioRecorder);
   const fillPercent = useSharedValue(0);
   const isLandscape = width > height;
 
   useEffect(() => {
     (async () => {
-      const status = await AudioModule.requestRecordingPermissionsAsync();
-      if (!status.granted) {
-        Alert.alert("Permission to access microphone was denied");
+      try {
+        const status = await AudioModule.requestRecordingPermissionsAsync();
+
+        if (!status.granted) {
+          Alert.alert("Permission to access microphone was denied");
+        }
+
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+          allowsRecording: true,
+          allowsBackgroundRecording: false,
+          shouldPlayInBackground: false,
+        });
+
+        await audioRecorder.prepareToRecordAsync({ isMeteringEnabled: true });
+      } catch (e) {
+        console.log(e);
       }
-      setAudioModeAsync({ playsInSilentMode: true, allowsRecording: true })
-        .then(async () => {
-          await recorder.prepareToRecordAsync({ isMeteringEnabled: true });
-        })
-        .catch(console.error);
     })();
   }, []);
 
   useEffect(() => {
     if (isRecording) {
-      void recorder?.record();
+      void audioRecorder?.record();
     } else {
-      if (recorder.isRecording) {
-        void recorder?.pause();
+      if (audioRecorder.isRecording) {
+        void audioRecorder?.stop();
         fillPercent.value = withSpring(0, SPRING_CONFIG);
       }
     }
   }, [isRecording]);
 
   useEffect(() => {
-    if (!state) {
+    if (!recorderState) {
       return;
     }
 
-    if (state.isRecording) {
-      const raw = (state.metering ?? -160) + 160; // shift -160~0 → 0~160
+    if (recorderState.isRecording) {
+      const raw = (recorderState.metering ?? -160) + 160; // shift -160~0 → 0~160
       const normalized = Math.min(raw / 160, 1); // clamp to 0~1
       fillPercent.value = withSpring(normalized, SPRING_CONFIG);
     }
-  }, [state]);
+  }, [recorderState]);
 
   const gaugeTotalWidth = (width - insets.left - insets.right) / 3;
 

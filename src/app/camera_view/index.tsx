@@ -65,10 +65,7 @@ export default function CameraViewScreen() {
   );
   const [isSavingPreviewVideo, setIsSavingPreviewVideo] =
     useState<boolean>(false);
-  const [isVoiceRecognizing, setIsVoiceRecognizing] = useState(false);
-  const [transcript, setTranscript] = useState("");
   const totalScrollHeightRef = useRef(0);
-  const scriptWordIndexRef = useRef(0);
   const recordingTimeRef = useRef<NodeJS.Timeout | null>(null);
   const [currentRecordingTime, setCurrentRecordingTime] = useState(0);
   const [MMKVScrollSpeed] = useMMKVNumber("scrollSpeed");
@@ -77,10 +74,9 @@ export default function CameraViewScreen() {
   const [MMKVScriptBackgroundOpacity] = useMMKVNumber(
     "scriptBackgroundOpacity",
   );
-  const [MMKVResolution, setMMKVResolution] = useMMKVString("resolution");
-  const [MMKVFrameRate, setMMKVFrameRate] = useMMKVNumber("frameRate");
-  const [MMKVStabilization, setMMKVStabilization] =
-    useMMKVString("stabilization");
+  const [MMKVResolution] = useMMKVString("resolution");
+  const [MMKVFrameRate] = useMMKVNumber("frameRate");
+  const [MMKVStabilization] = useMMKVString("stabilization");
   const cameraDevice = useCameraDevice(cameraPosition);
   const cameraFormat = useCameraFormat(cameraDevice, [
     { fps: MMKVFrameRate },
@@ -96,34 +92,6 @@ export default function CameraViewScreen() {
     },
   ]);
 
-  // const [MMKVVoiceRecognition, _setMMKVVoiceRecognition] =
-  //   useMMKVBoolean("voiceRecognition");
-  // const [MMKVLanguage, _setMMKVLanguage] = useMMKVString("language");
-
-  // useSpeechRecognitionEvent("start", () => {
-  //   console.log("voice recognition, start");
-  //   setIsVoiceRecognizing(true);
-  // });
-  // useSpeechRecognitionEvent("end", () => {
-  //   console.log("voice recognition end");
-  //   setIsVoiceRecognizing(false);
-  // });
-  // useSpeechRecognitionEvent("result", (event) => {
-  //   const text = event.results[0]?.transcript ?? "";
-  //   setTranscript(text);
-  //
-  //   if (MMKVVoiceRecognition && isRecording) {
-  //     scrollToTranscriptPosition(text);
-  //   }
-  // });
-  // useSpeechRecognitionEvent("error", (event) => {
-  //   console.log("error code:", event.error, "error message:", event.message);
-  // });
-  // useSpeechRecognitionEvent("volumechange", (event) => {
-  //   // a value between -2 and 10. <= 0 is inaudible
-  //   // console.log("Volume changed to:", event.value);
-  // });
-
   // hide the tab bar
   useFocusEffect(() => {
     setIsTabBarHidden(true);
@@ -133,11 +101,11 @@ export default function CameraViewScreen() {
   // ask permissions
   useEffect(() => {
     if (!hasCameraPermission) {
-      requestCameraPermission();
+      void requestCameraPermission();
     }
 
     if (!hasMicrophonePermission) {
-      requestMicrophonePermission();
+      void requestMicrophonePermission();
     }
   }, [hasCameraPermission, hasMicrophonePermission]);
 
